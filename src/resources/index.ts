@@ -28,13 +28,11 @@ import type {
   PaginatedResponse,
   Payment,
   Payout,
-  Subscription,
   SubscriptionListResponse,
   SubscriptionPlanListResponse,
   SubscriptionPlanResponse,
   SubscriptionResponse,
   UpdatePlanPayload,
-  UpdateSubscriptionPayload,
   ValidateAddressPayload,
   ValidateAddressResponse,
 } from "../types.js";
