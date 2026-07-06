@@ -272,6 +272,11 @@ All endpoints are under `https://api.nowpayments.io/v1/`.
 | `payouts`     | `create`      | `POST /v1/payout`         | JWT      |
 | `payouts`     | `list`        | `GET /v1/payout`          | JWT      |
 | `payouts`     | `get`         | `GET /v1/payout/{id}`     | JWT      |
+| `payouts`     | `verifyBatchWithdrawal` | `POST /v1/payout/:batch-withdrawal-id/verify` | JWT |
+| `payouts`     | `getMinWithdrawalAmount` | `GET /v1/payout-withdrawal/min-amount/:coin` | API key |
+| `payouts`     | `getFee`      | `GET /v1/payout/fee`      | API key  |
+| `payouts`     | `cancel`      | `POST /v1/payout/:payout_id/cancel` | JWT |
+| `payouts`     | `cancelBatch` | `POST /v1/payout/:batch_id/cancel-batch` | JWT |
 | `customers`   | `balance`     | `GET /v1/sub-partner/balance/{id}` | API key |
 | `customers`   | `list`        | `GET /v1/sub-partner`     | JWT      |
 | `customers`   | `create`      | `POST /v1/sub-partner`    | JWT      |

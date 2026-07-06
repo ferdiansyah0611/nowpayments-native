@@ -251,6 +251,54 @@ export interface ValidateAddressResponse {
   message?: string;
 }
 
+/** Payload to verify a batch withdrawal (`POST /v1/payout/:batch-withdrawal-id/verify`). */
+export interface VerifyBatchWithdrawalPayload {
+  /** 2FA code from Google Auth app or email. */
+  verification_code: string;
+}
+
+/** Response from `POST /v1/payout/:batch-withdrawal-id/verify`. */
+export interface VerifyBatchWithdrawalResponse {
+  /** Success message. */
+  result: string;
+}
+
+/** Parameters for listing payouts. */
+export interface ListPayoutsParams {
+  /** Batch ID of enlisted payouts. */
+  batch_id?: string;
+  /** Statuses of enlisted payouts. */
+  status?: string;
+  /** Sort field. */
+  order_by?: "id" | "batchId" | "dateCreated" | "dateRequested" | "dateUpdated" | "currency" | "status";
+  /** Sort direction. */
+  order?: "asc" | "desc";
+  /** Beginning date of the requested payouts. */
+  date_from?: string;
+  /** Ending date of the requested payouts. */
+  date_to?: string;
+  /** Number of results to show. */
+  limit?: number;
+  /** Current page. */
+  page?: number;
+}
+
+/** Response from `GET /v1/payout-withdrawal/min-amount/:coin`. */
+export interface GetMinWithdrawalAmountResponse {
+  /** Whether the request was successful. */
+  success: boolean;
+  /** Minimum withdrawal amount for the specified coin. */
+  result: number;
+}
+
+/** Response from `GET /v1/payout/fee`. */
+export interface GetWithdrawalFeeResponse {
+  /** Currency. */
+  currency: CryptoCurrency;
+  /** Withdrawal fee. */
+  fee: number;
+}
+
 /** Invoice record returned by NowPayments. */
 export interface Invoice {
   id: number;
