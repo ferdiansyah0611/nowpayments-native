@@ -34,6 +34,7 @@ export {
   PaymentsResource,
   PayoutsResource,
   SubscriptionResource,
+  ConversionResource,
 } from "./resources/index.js";
 
 export { verifyIpnSignature, sortObject } from "./ipn.js";

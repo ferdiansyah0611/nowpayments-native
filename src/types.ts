@@ -519,6 +519,299 @@ export interface ListCustomersParams {
 }
 
 // ---------------------------------------------------------------------------
+// Customer Payment & Transfer types
+// ---------------------------------------------------------------------------
+
+/** Payload to create a payment for a customer. */
+export interface CreateCustomerPaymentPayload {
+  /** Customer id. */
+  sub_partner_id: string;
+  /** Amount to pay in fiat currency. */
+  price_amount: Money;
+  /** Fiat currency in which the price_amount is specified (usd, eur, etc). */
+  price_currency: FiatCurrency;
+  /** Crypto currency in which the pay_amount is specified. */
+  pay_currency?: CryptoCurrency;
+  /** Url to receive callbacks. */
+  ipn_callback_url?: string;
+  /** Inner store order ID. */
+  order_id?: string;
+  /** Inner store order description. */
+  order_description?: string;
+}
+
+/** Customer payment record. */
+export interface CustomerPayment {
+  /** Payment id. */
+  payment_id: number;
+  /** Payment status. */
+  payment_status: PaymentStatus;
+  /** Deposit address. */
+  pay_address: string;
+  /** Amount to pay in crypto. */
+  pay_amount: Money;
+  /** Amount actually paid. */
+  actually_paid?: Money;
+  /** Fiat equivalent of actually paid amount. */
+  actually_paid_at_fiat?: Money;
+  /** Crypto currency. */
+  pay_currency: CryptoCurrency;
+  /** Fiat amount. */
+  price_amount: Money;
+  /** Fiat currency. */
+  price_currency: FiatCurrency;
+  /** Order ID. */
+  order_id: string | null;
+  /** Order description. */
+  order_description: string | null;
+  /** Purchase ID. */
+  purchase_id: string | null;
+  /** Outcome amount. */
+  outcome_amount?: Money;
+  /** Outcome currency. */
+  outcome_currency?: CryptoCurrency;
+  /** Parent payment ID (for repeated deposits). */
+  parent_payment_id?: number | null;
+  /** Invoice ID. */
+  invoice_id?: string | null;
+  /** Payment extra IDs. */
+  payment_extra_ids?: string | null;
+  /** Created at timestamp. */
+  created_at: string;
+  /** Updated at timestamp. */
+  updated_at: string;
+}
+
+/** Customer payments list response. */
+export interface CustomerPaymentsListResponse {
+  result: CustomerPayment[];
+  /** Total number of payments. */
+  count: number;
+}
+
+/** Payload to deposit from master account to customer. */
+export interface DepositPayload {
+  currency: string;
+  amount: number;
+  sub_partner_id: string;
+}
+
+export interface CreateDepositResponse {
+  id: string;
+  /** main account */
+  from_sub_id: string;
+  /** sub account */
+  to_sub_id: string;
+  status: ListTransfersStatus,
+  created_at: string;
+  updated_at: string;
+  amount: string;
+  currency: string;
+}
+
+/** Deposit record. */
+export interface Deposit {
+  /** Deposit id. */
+  id: number;
+  /** Customer id. */
+  sub_partner_id: string;
+  /** Payment status. */
+  payment_status: PaymentStatus;
+  /** Deposit address. */
+  pay_address: string;
+  /** Amount to deposit. */
+  pay_amount: Money;
+  /** Amount actually deposited. */
+  actually_paid?: Money;
+  /** Fiat equivalent of actually deposited amount. */
+  actually_paid_at_fiat?: Money;
+  /** Crypto currency. */
+  pay_currency: CryptoCurrency;
+  /** Fiat amount. */
+  price_amount: Money;
+  /** Fiat currency. */
+  price_currency: FiatCurrency;
+  /** Order ID. */
+  order_id: string | null;
+  /** Order description. */
+  order_description: string | null;
+  /** Purchase ID. */
+  purchase_id: string | null;
+  /** Outcome amount. */
+  outcome_amount?: Money;
+  /** Outcome currency. */
+  outcome_currency?: CryptoCurrency;
+  /** Parent payment ID. */
+  parent_payment_id?: number | null;
+  /** Invoice ID. */
+  invoice_id?: string | null;
+  /** Payment extra IDs. */
+  payment_extra_ids?: string | null;
+  /** Created at timestamp. */
+  created_at: string;
+  /** Updated at timestamp. */
+  updated_at: string;
+}
+
+/** Deposit list response. */
+export interface DepositListResponse {
+  result: Deposit[];
+  /** Total number of deposits. */
+  count: number;
+}
+
+/** Payload to transfer between customers. */
+export interface TransferPayload {
+  /** From customer id. */
+  from_id: string;
+  /** To customer id. */
+  to_id: string;
+  /** Amount to transfer. */
+  amount: number;
+  /** Currency of the amount to transfer. */
+  currency: string;
+}
+
+/** Transfer record. */
+export interface Transfer {
+  /** Transfer id. */
+  id: number;
+  /** From customer id. */
+  from_sub_partner_id: string;
+  /** To customer id. */
+  to_sub_partner_id: string;
+  /** Payment status. */
+  payment_status: PaymentStatus;
+  /** Deposit address. */
+  pay_address: string;
+  /** Amount to transfer. */
+  pay_amount: Money;
+  /** Amount actually transferred. */
+  actually_paid?: Money;
+  /** Fiat equivalent of actually transferred amount. */
+  actually_paid_at_fiat?: Money;
+  /** Crypto currency. */
+  pay_currency: CryptoCurrency;
+  /** Fiat amount. */
+  price_amount: Money;
+  /** Fiat currency. */
+  price_currency: FiatCurrency;
+  /** Order ID. */
+  order_id: string | null;
+  /** Order description. */
+  order_description: string | null;
+  /** Purchase ID. */
+  purchase_id: string | null;
+  /** Outcome amount. */
+  outcome_amount?: Money;
+  /** Outcome currency. */
+  outcome_currency?: CryptoCurrency;
+  /** Parent payment ID. */
+  parent_payment_id?: number | null;
+  /** Invoice ID. */
+  invoice_id?: string | null;
+  /** Payment extra IDs. */
+  payment_extra_ids?: string | null;
+  /** Created at timestamp. */
+  created_at: string;
+  /** Updated at timestamp. */
+  updated_at: string;
+}
+
+/** Transfer list response. */
+export interface TransferListResponse {
+  result: Transfer[];
+  /** Total number of transfers. */
+  count: number;
+}
+
+/** Payload to transfer between customers. */
+export interface TransferPayload {
+  currency: string,
+  amount: number,
+  from_id: string,
+  to_id:  string
+}
+
+/** Write off record. */
+export interface WriteOff {
+  /** Write off id. */
+  id: number;
+  /** Customer id. */
+  sub_partner_id: string;
+  /** Payment status. */
+  payment_status: PaymentStatus;
+  /** Deposit address. */
+  pay_address: string;
+  /** Amount to write off. */
+  pay_amount: Money;
+  /** Amount actually written off. */
+  actually_paid?: Money;
+  /** Fiat equivalent of actually written off amount. */
+  actually_paid_at_fiat?: Money;
+  /** Crypto currency. */
+  pay_currency: CryptoCurrency;
+  /** Fiat amount. */
+  price_amount: Money;
+  /** Fiat currency. */
+  price_currency: FiatCurrency;
+  /** Order ID. */
+  order_id: string | null;
+  /** Order description. */
+  order_description: string | null;
+  /** Purchase ID. */
+  purchase_id: string | null;
+  /** Outcome amount. */
+  outcome_amount?: Money;
+  /** Outcome currency. */
+  outcome_currency?: CryptoCurrency;
+  /** Parent payment ID. */
+  parent_payment_id?: number | null;
+  /** Invoice ID. */
+  invoice_id?: string | null;
+  /** Payment extra IDs. */
+  payment_extra_ids?: string | null;
+  /** Created at timestamp. */
+  created_at: string;
+  /** Updated at timestamp. */
+  updated_at: string;
+}
+
+/** Write off list response. */
+export interface WriteOffListResponse {
+  result: WriteOff[];
+  /** Total number of write offs. */
+  count: number;
+}
+
+/** Transfer list response. */
+export interface TransferListResponse {
+  result: Transfer[];
+  /** Total number of transfers. */
+  count: number;
+}
+
+/** Payload to write off on customer account. */
+export interface WriteOffPayload {
+  currency: string;
+  amount: number;
+  sub_partner_id: string;
+}
+
+export interface WriteOffCreateResponse {
+  result: {
+    id: string;
+    from_sub_id: string;
+    to_sub_id: string;
+    status: ListTransfersStatus;
+    created_at: string;
+    updated_at: string;
+    amount: string;
+    currency: string;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Email Subscriptions (recurring payments) types
 // ---------------------------------------------------------------------------
 
@@ -716,4 +1009,106 @@ export interface ListSubscriptionsParams {
   subscription_plan_id?: string | number;
   /** Filter by active status. */
   is_active?: boolean;
+}
+
+export type ListTransfersStatus = "WAITING"|"CREATED"|"FINISHED"|"REJECTED";
+/** Parameters for listing transfers. */
+export interface ListTransfersParams {
+  /** int or array of int (optional) */
+  id?: number | number[];
+  status: ListTransfersStatus;
+  limit: number;
+  offset: number;
+  order: 'ASC' | 'DESC';
+}
+
+/** Parameters for listing write offs. */
+export interface ListWriteOffsParams {
+  /** Number of records per page. @default 10 */
+  limit?: number;
+  /** Page number (0-indexed). @default 0 */
+  page?: number;
+  /** Sort field. @default "created_at" */
+  sortBy?: string;
+  /** Sort direction. @default "asc" */
+  orderBy?: "asc" | "desc";
+  /** Period start date (`YYYY-MM-DD` or ISO 8601). */
+  dateFrom?: string;
+  /** Period end date (`YYYY-MM-DD` or ISO 8601). */
+  dateTo?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Conversion (currency conversion) types
+// ---------------------------------------------------------------------------
+
+/** Status of a currency conversion. */
+export type ConversionStatus =
+  | "WAITING"
+  | "PROCESSING"
+  | "FINISHED"
+  | "REJECTED";
+
+/** A single conversion record. */
+export interface Conversion {
+  /** Conversion ID. */
+  id: string;
+  /** Current status of the conversion. */
+  status: ConversionStatus;
+  /** Currency being converted from. */
+  from_currency: CryptoCurrency;
+  /** Currency being converted to. */
+  to_currency: CryptoCurrency;
+  /** Amount being converted from. */
+  from_amount: Money;
+  /** Amount received after conversion. */
+  to_amount: Money | null;
+  /** ISO 8601 creation timestamp. */
+  created_at: string;
+  /** ISO 8601 last-update timestamp. */
+  updated_at: string;
+}
+
+/** Payload to create a new conversion. */
+export interface CreateConversionPayload {
+  /** The amount of the conversion. */
+  amount: Money;
+  /** The currency you're converting your funds from. */
+  from_currency: CryptoCurrency;
+  /** The currency you're converting your funds to. */
+  to_currency: CryptoCurrency;
+}
+
+/** Response wrapper for conversion operations. */
+export interface ConversionResponse {
+  result: Conversion;
+}
+
+/** Parameters for listing conversions. */
+export interface ListConversionsParams {
+  /** Filter by ID of the conversion (int or array of int). */
+  id?: number | number[];
+  /** Filter conversions by certain status (string or array of string). */
+  status?: ConversionStatus | ConversionStatus[];
+  /** Filter by initial currency of the conversion. */
+  from_currency?: CryptoCurrency;
+  /** Filter by outcome currency of the conversion. */
+  to_currency?: CryptoCurrency;
+  /** Filter by date (ISO 8601 format). */
+  created_at_from?: string;
+  /** Filter by date (ISO 8601 format). */
+  created_at_to?: string;
+  /** Set the limit of shown results. @default 10 */
+  limit?: number;
+  /** Page number (0-indexed). @default 0 */
+  offset?: number;
+  /** Set the sorting order of provided data. */
+  order?: "ASC" | "DESC";
+}
+
+/** Response for listing conversions. */
+export interface ListConversionsResponse {
+  result: Conversion[];
+  /** Total number of conversions matching the query. */
+  count: number;
 }

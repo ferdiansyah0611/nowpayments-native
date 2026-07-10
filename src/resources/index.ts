@@ -4,8 +4,10 @@ import type {
   ApiStatus,
   AuthPayload,
   AuthStatus,
+  CreateCustomerPaymentPayload,
   CreateCustomerPayload,
   CreateCustomerResponse,
+  CreateConversionPayload,
   CreateInvoicePayload,
   CreatePaymentPayload,
   CreatePayoutPayload,
@@ -15,13 +17,18 @@ import type {
   CreatePlanPayload,
   CurrenciesResponse,
   CustomerBalanceResponse,
+  CustomerPaymentsListResponse,
   CustomersListResponse,
+  ConversionResponse,
+  DepositListResponse,
   EstimatedPrice,
   FullCurrenciesResponse,
   Invoice,
   JwtToken,
   ListCurrenciesParams,
   ListCustomersParams,
+  ListConversionsParams,
+  ListConversionsResponse,
   ListPlansParams,
   ListSubscriptionsParams,
   ListPayoutsParams,
@@ -33,6 +40,8 @@ import type {
   SubscriptionPlanListResponse,
   SubscriptionPlanResponse,
   SubscriptionResponse,
+  Transfer,
+  TransferListResponse,
   UpdatePlanPayload,
   ValidateAddressPayload,
   ValidateAddressResponse,
@@ -41,6 +50,14 @@ import type {
   GetMinWithdrawalAmountResponse,
   GetWithdrawalFeeResponse,
   CryptoCurrency,
+  PaymentStatus,
+  Deposit,
+  ListTransfersParams,
+  TransferPayload,
+  DepositPayload,
+  CreateDepositResponse,
+  WriteOffCreateResponse,
+  WriteOffPayload,
 } from "../types.js";
 
 /** Base class for resource groups — holds a reference to the HTTP client. */
@@ -330,6 +347,53 @@ export class PayoutsResource extends Resource {
   }
 }
 
+export interface ListPaymentsCustomerParams {
+  /** amount of listed results */
+  limit: number;
+  /** set the offset for listed results */
+  page?: number;
+  /** filter by payment ID */
+  id?: string;
+  /** filter by deposit currency */
+  pay_currency?: CryptoCurrency;
+  /** filter by status */
+  status?: PaymentStatus;
+  /** filter by sub-partner ID */
+  sub_partner_id?: string;
+  /** filter by date (from) */
+  date_from?: string;
+  /** filter by date (to) */
+  date_to?: string;
+  /** set the order for listed results (asc, desc) */
+  orderBy?: "asc" | "desc";
+  /** sort results by 'id', 'status', 'pay_currency', 'created_at', 'updated_at' */
+  sortBy?: "id" | "status" | "pay_currency" | "created_at" | "updated_at";
+}
+
+/** Parameters for listing deposits. */
+export interface ListDepositsParams {
+  /** amount of listed results */
+  limit: number;
+  /** set the offset for listed results */
+  page?: number;
+  /** filter by deposit ID */
+  id?: string;
+  /** filter by deposit currency */
+  pay_currency?: CryptoCurrency;
+  /** filter by status */
+  status?: PaymentStatus;
+  /** filter by sub-partner ID */
+  sub_partner_id?: string;
+  /** filter by date (from) */
+  date_from?: string;
+  /** filter by date (to) */
+  date_to?: string;
+  /** set the order for listed results (asc, desc) */
+  orderBy?: "asc" | "desc";
+  /** sort results by 'id', 'status', 'pay_currency', 'created_at', 'updated_at' */
+  sortBy?: "id" | "status" | "pay_currency" | "created_at" | "updated_at";
+}
+
 /**
  * Customer management (sub-partner) endpoints.
  *
@@ -337,6 +401,13 @@ export class PayoutsResource extends Resource {
  * - `GET /v1/sub-partner` — list customers (JWT).
  * - `POST /v1/sub-partner` — create a customer account (JWT).
  * - `POST /v1/sub-partner/recurring` — create a recurring payment (JWT).
+ * - `POST /v1/sub-partner/payment` — create a payment for a customer (JWT).
+ * - `GET /v1/sub-partner/payments` — list payments for a customer (JWT).
+ * - `POST /v1/sub-partner/deposit` — deposit funds to a customer (JWT).
+ * - `POST /v1/sub-partner/transfer` — transfer funds between customers (JWT).
+ * - `GET /v1/sub-partner/transfer` — list transfers (JWT).
+ * - `GET /v1/sub-partner/transfer/:id` — get a single transfer (JWT).
+ * - `POST /v1/sub-partner/write-off` — write off funds from a customer (JWT).
  */
 export class CustomerResource extends Resource {
   /**
@@ -389,6 +460,126 @@ export class CustomerResource extends Resource {
     return this.http.post<CreateRecurringPaymentResponse>(
       "/v1/sub-partner/recurring",
       payload as unknown as Record<string, unknown>,
+      options,
+    );
+  }
+
+  /**
+   * Creates a payment for a customer.
+   * Authenticated with a JWT bearer token.
+   */
+  createPayment(
+    payload: CreateCustomerPaymentPayload,
+    options?: RequestOptions,
+  ): Promise<Payment> {
+    return this.http.post<Payment>(
+      "/v1/sub-partner/payment",
+      payload as unknown as Record<string, unknown>,
+      options,
+    );
+  }
+
+  /**
+   * Returns the list of payments for a customer.
+   * Authenticated with a JWT bearer token.
+   */
+  listPayments(
+    params?: ListPaymentsCustomerParams,
+    options?: RequestOptions,
+  ): Promise<CustomerPaymentsListResponse> {
+    return this.http.get<CustomerPaymentsListResponse>(
+      "/v1/sub-partner/payments",
+      params as QueryParams | undefined,
+      options,
+    );
+  }
+
+  /**
+   * This is a method for transferring funds from your master account to a customer's one.
+   * The actual information about the transfer's status can be obtained via Get transfer method.
+   */
+  createDeposits(
+    payload: DepositPayload,
+    options?: RequestOptions,
+  ): Promise<{ result: CreateDepositResponse }> {
+    return this.http.post<{ result: CreateDepositResponse }>(
+      "/v1/sub-partner/deposit",
+      payload as unknown as Record<string, unknown>,
+      options,
+    );
+  }
+
+  /**
+   * Returns the list of deposits for a customer.
+   * Authenticated with a JWT bearer token.
+   */
+  listDeposits(
+    params?: ListDepositsParams,
+    options?: RequestOptions,
+  ): Promise<DepositListResponse> {
+    return this.http.get<DepositListResponse>(
+      "/v1/sub-partner/deposit",
+      params as QueryParams | undefined,
+      options,
+    );
+  }
+
+  /**
+   * Returns a single deposit by its id.
+   * Authenticated with a JWT bearer token.
+   */
+  getDeposit(depositId: number | string, options?: RequestOptions): Promise<Deposit> {
+    return this.http.get<Deposit>(`/v1/sub-partner/deposit/${depositId}`, undefined, options);
+  }
+
+  /**
+   * Creates a transfer between two customers.
+   * Authenticated with a JWT bearer token.
+   */
+  createTransfers(
+    params: TransferPayload,
+    options?: RequestOptions,
+  ): Promise<WriteOffCreateResponse> {
+    return this.http.post<WriteOffCreateResponse>(
+      "/v1/sub-partner/transfer",
+      params as unknown as Record<string, unknown>,
+      options,
+    );
+  }
+  
+  /**
+   * Returns the list of transfers for a customer.
+   * Authenticated with a JWT bearer token.
+   */
+  listTransfers(
+    params?: ListTransfersParams,
+    options?: RequestOptions,
+  ): Promise<TransferListResponse> {
+    return this.http.get<TransferListResponse>(
+      "/v1/sub-partner/transfer",
+      params as QueryParams | undefined,
+      options,
+    );
+  }
+
+  /**
+   * Returns a single transfer by its id.
+   * Authenticated with a JWT bearer token.
+   */
+  getTransfer(transferId: number | string, options?: RequestOptions): Promise<Transfer> {
+    return this.http.get<Transfer>(`/v1/sub-partner/transfer/${transferId}`, undefined, options);
+  }
+
+  /**
+   * With this method you can withdraw funds from a customer's account and transfer them to your master account.
+   */
+  createWriteOff(
+    payload: WriteOffPayload,
+    options?: RequestOptions,    
+  ): Promise<WriteOffCreateResponse> {
+    return this.http.post<WriteOffCreateResponse>(
+      "/v1/sub-partner/write-off",
+      payload  as unknown as Record<string, unknown>,
       options,
     );
   }
@@ -525,6 +716,51 @@ export class SubscriptionResource extends Resource {
     return this.http.delete<SubscriptionResponse>(
       `v1/subscriptions/${id}`,
       undefined,
+      options,
+    );
+  }
+}
+
+/**
+ * Currency conversion endpoints.
+ *
+ * - `POST v1/conversion` — create a conversion (JWT).
+ * - `GET v1/conversion/:conversion_id` — get a single conversion (JWT).
+ * - `GET v1/conversion` — list conversions with filters (JWT).
+ */
+export class ConversionResource extends Resource {
+  /**
+   * Creates a new currency conversion.
+   * Requires JWT authentication.
+   */
+  create(payload: CreateConversionPayload, options?: RequestOptions): Promise<ConversionResponse> {
+    return this.http.post<ConversionResponse>(
+      "v1/conversion",
+      payload as unknown as Record<string, unknown>,
+      options,
+    );
+  }
+
+  /**
+   * Gets a single conversion by its id.
+   * Requires JWT authentication.
+   */
+  get(conversionId: string, options?: RequestOptions): Promise<ConversionResponse> {
+    return this.http.get<ConversionResponse>(
+      `v1/conversion/${conversionId}`,
+      undefined,
+      options,
+    );
+  }
+
+  /**
+   * Lists conversions with optional filters.
+   * Requires JWT authentication.
+   */
+  list(params?: ListConversionsParams, options?: RequestOptions): Promise<ListConversionsResponse> {
+    return this.http.get<ListConversionsResponse>(
+      "v1/conversion",
+      params as QueryParams | undefined,
       options,
     );
   }
