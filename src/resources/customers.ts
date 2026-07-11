@@ -17,7 +17,7 @@ import type {
   TransferPayload,
   WriteOffCreateResponse,
   WriteOffPayload,
-} from "../types.js";
+} from "../types/index.js";
 
 /** Base class for resource groups — holds a reference to the HTTP client. */
 abstract class Resource {

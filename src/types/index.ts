@@ -1,9 +1,9 @@
-// Import all resource classes
+// Import all types from resource-specific files
+export * from "./main.js";
 export * from "./auth.js";
-export * from "./currencies.js";
 export * from "./payments.js";
-export * from "./payouts.js";
+export * from "./currencies.js";
 export * from "./customers.js";
 export * from "./subscriptions.js";
-export * from "./conversions.js";
+export * from "./payouts.js";
 export * from "./conversions.js";

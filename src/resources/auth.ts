@@ -1,5 +1,5 @@
 import type { HttpClient, RequestOptions } from "../http.js";
-import type { ApiStatus, AuthPayload, AuthStatus, JwtToken } from "../types.js";
+import type { ApiStatus, AuthPayload, AuthStatus, JwtToken } from "../types/index.js";
 
 /** Base class for resource groups — holds a reference to the HTTP client. */
 abstract class Resource {
