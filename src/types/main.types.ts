@@ -93,3 +93,75 @@ export interface ListWriteOffsParams {
 }
 
 export type ListTransfersStatus = "WAITING"|"CREATED"|"FINISHED"|"REJECTED";
+
+/** API status response (returned by `GET /v1/status`). */
+export interface ApiStatus {
+  /** Status message, e.g. "OK". */
+  message: string;
+}
+
+/** Authentication status response (returned by `GET /v1/auth/decoded`). */
+export interface AuthStatus {
+  /** Whether the API key is valid. */
+  result: boolean;
+  /** Message describing the result. */
+  message?: string;
+  code?: number;
+}
+
+/** JWT token response from `/auth`. */
+export interface JwtToken {
+  token: string;
+}
+
+/** API key payload for `/auth`. */
+export interface AuthPayload {
+  email: string;
+  password: string;
+}
+
+/** Payment verification result. */
+export interface PaymentVerification {
+  /** Whether the payment verification succeeded. */
+  result: boolean;
+  message?: string;
+  code?: number;
+}
+
+/** IPN webhook payload for payments. */
+export interface IpnNotification {
+  payment_id: number;
+  /** ID of the original payment (for repeated/wrong-asset deposits). */
+  parent_payment_id?: number | null;
+  invoice_id?: string | null;
+  payment_status: PaymentStatus;
+  pay_address: string;
+  payin_extra_id?: string | null;
+  price_amount: Money;
+  price_currency: FiatCurrency;
+  pay_amount: Money;
+  /** Amount actually received from the payer. */
+  actually_paid?: Money;
+  /** Fiat equivalent of the amount actually paid. */
+  actually_paid_at_fiat?: Money;
+  pay_currency: CryptoCurrency;
+  order_id: string | null;
+  order_description: string | null;
+  purchase_id: string;
+  outcome_amount?: Money;
+  outcome_currency?: CryptoCurrency;
+  payment_extra_ids?: string | null;
+  fee?: PaymentFee;
+}
+
+/** Fee breakdown returned in payment records and IPN webhooks. */
+export interface PaymentFee {
+  /** Currency the fees are denominated in. */
+  currency?: CryptoCurrency;
+  /** Deposit fee applied to the payment. */
+  depositFee?: number;
+  /** Withdrawal fee applied to the payment. */
+  withdrawalFee?: number;
+  /** Service fee applied to the payment. */
+  serviceFee?: number;
+}

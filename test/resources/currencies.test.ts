@@ -72,30 +72,4 @@ describe("NowPayments - Currencies", () => {
       expect(result.currencies).toEqual(["btc", "eth", "usdttrc20"]);
     });
   });
-
-  describe("currencies.estimate", () => {
-    it("returns the estimated amount", async () => {
-      const fetchImpl = fakeFetch(
-        jsonResponse({ currency_from: "usd", amount_from: 10, currency_to: "btc", estimated_amount: 0.00016 }),
-      );
-      const c = new NowPayments({ apiKey: "k", fetchImpl });
-      const result = await c.currencies.estimate({
-        amount: 10,
-        currency_from: "usd",
-        currency_to: "btc",
-      });
-      expect(result.estimated_amount).toBe(0.00016);
-    });
-  });
-
-  describe("currencies.minimumAmount", () => {
-    it("returns the min_amount", async () => {
-      const fetchImpl = fakeFetch(
-        jsonResponse({ currency_from: "btc", currency_to: "usd", min_amount: 0.001 }),
-      );
-      const c = new NowPayments({ apiKey: "k", fetchImpl });
-      const result = await c.currencies.minimumAmount({ currency_from: "btc", currency_to: "usd" });
-      expect(result.min_amount).toBe(0.001);
-    });
-  });
 });

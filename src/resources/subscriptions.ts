@@ -1,15 +1,5 @@
 import type { HttpClient, RequestOptions, QueryParams } from "../http.js";
-import type {
-  CreatePlanPayload,
-  CreateSubscriptionPayload,
-  ListPlansParams,
-  ListSubscriptionsParams,
-  SubscriptionListResponse,
-  SubscriptionPlanListResponse,
-  SubscriptionPlanResponse,
-  SubscriptionResponse,
-  UpdatePlanPayload,
-} from "../types/index.js";
+import type { Subscription } from "../types/subscriptions.types.js";
 
 /** Base class for resource groups — holds a reference to the HTTP client. */
 abstract class Resource {
@@ -47,10 +37,10 @@ export class SubscriptionResource extends Resource {
    * Authenticated with a JWT bearer token.
    */
   createPlan(
-    payload: CreatePlanPayload,
+    payload: Subscription.CreatePlanPayload,
     options?: RequestOptions,
-  ): Promise<SubscriptionPlanResponse> {
-    return this.http.post<SubscriptionPlanResponse>(
+  ): Promise<Subscription.PlanResponse> {
+    return this.http.post<Subscription.PlanResponse>(
       "v1/subscriptions/plans",
       payload as unknown as Record<string, unknown>,
       options,
@@ -61,8 +51,8 @@ export class SubscriptionResource extends Resource {
    * Gets a single subscription plan by its id.
    * Requires API key authentication.
    */
-  getPlan(id: string, options?: RequestOptions): Promise<SubscriptionPlanResponse> {
-    return this.http.get<SubscriptionPlanResponse>(
+  getPlan(id: string, options?: RequestOptions): Promise<Subscription.PlanResponse> {
+    return this.http.get<Subscription.PlanResponse>(
       `v1/subscriptions/plans/${id}`,
       undefined,
       options,
@@ -74,10 +64,10 @@ export class SubscriptionResource extends Resource {
    * Requires API key authentication.
    */
   getAllPlans(
-    params?: ListPlansParams,
+    params?: Subscription.ListPlansParams,
     options?: RequestOptions,
-  ): Promise<SubscriptionPlanListResponse> {
-    return this.http.get<SubscriptionPlanListResponse>(
+  ): Promise<Subscription.PlanListResponse> {
+    return this.http.get<Subscription.PlanListResponse>(
       "v1/subscriptions/plans",
       params as QueryParams | undefined,
       options,
@@ -90,10 +80,10 @@ export class SubscriptionResource extends Resource {
    */
   updatePlan(
     id: string,
-    payload: UpdatePlanPayload,
+    payload: Subscription.UpdatePlanPayload,
     options?: RequestOptions,
-  ): Promise<SubscriptionPlanResponse> {
-    return this.http.patch<SubscriptionPlanResponse>(
+  ): Promise<Subscription.PlanResponse> {
+    return this.http.patch<Subscription.PlanResponse>(
       `v1/subscriptions/plans/${id}`,
       payload as unknown as Record<string, unknown>,
       options,
@@ -105,10 +95,10 @@ export class SubscriptionResource extends Resource {
    * Authenticated with API key or JWT.
    */
   createPayment(
-    payload: CreateSubscriptionPayload,
+    payload: Subscription.CreatePayload,
     options?: RequestOptions,
-  ): Promise<SubscriptionResponse> {
-    return this.http.post<SubscriptionResponse>(
+  ): Promise<Subscription.Response> {
+    return this.http.post<Subscription.Response>(
       "v1/subscriptions",
       payload as unknown as Record<string, unknown>,
       options,
@@ -120,10 +110,10 @@ export class SubscriptionResource extends Resource {
    * Requires API key authentication.
    */
   listPayments(
-    params?: ListSubscriptionsParams,
+    params?: Subscription.ListParams,
     options?: RequestOptions,
-  ): Promise<SubscriptionListResponse> {
-    return this.http.get<SubscriptionListResponse>(
+  ): Promise<Subscription.ListResponse> {
+    return this.http.get<Subscription.ListResponse>(
       "v1/subscriptions",
       params as QueryParams | undefined,
       options,
@@ -134,8 +124,8 @@ export class SubscriptionResource extends Resource {
    * Gets a single subscription payment by its id.
    * Requires API key authentication.
    */
-  getPayment(id: string, options?: RequestOptions): Promise<SubscriptionResponse> {
-    return this.http.get<SubscriptionResponse>(
+  getPayment(id: string, options?: RequestOptions): Promise<Subscription.Response> {
+    return this.http.get<Subscription.Response>(
       `v1/subscriptions/${id}`,
       undefined,
       options,
@@ -146,8 +136,8 @@ export class SubscriptionResource extends Resource {
    * Cancels a subscription payment by its id.
    * Authenticated with a JWT bearer token.
    */
-  cancelPayment(id: string, options?: RequestOptions): Promise<SubscriptionResponse> {
-    return this.http.delete<SubscriptionResponse>(
+  cancelPayment(id: string, options?: RequestOptions): Promise<Subscription.Response> {
+    return this.http.delete<Subscription.Response>(
       `v1/subscriptions/${id}`,
       undefined,
       options,

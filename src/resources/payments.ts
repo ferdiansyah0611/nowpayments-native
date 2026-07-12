@@ -1,14 +1,8 @@
 import type { HttpClient, RequestOptions, QueryParams } from "../http.js";
 import type {
-  AccountBalance,
-  CreateInvoicePayload,
-  CreatePaymentPayload,
-  Invoice,
-  PaginatedResponse,
-  Payment,
-  ValidateAddressPayload,
-  ValidateAddressResponse,
+  PaginatedResponse
 } from "../types/index.js";
+import type { Payment } from "../types/payments.types.js";
 
 /** Base class for resource groups — holds a reference to the HTTP client. */
 abstract class Resource {
@@ -31,8 +25,8 @@ abstract class Resource {
  */
 export class PaymentsResource extends Resource {
   /** Creates a new payment and returns the deposit address. */
-  create(payload: CreatePaymentPayload, options?: RequestOptions): Promise<Payment> {
-    return this.http.post<Payment>(
+  create(payload: Payment.CreatePayload, options?: RequestOptions): Promise<Payment.Payment> {
+    return this.http.post<Payment.Payment>(
       "/v1/payment",
       payload as unknown as Record<string, unknown>,
       options,
@@ -40,8 +34,8 @@ export class PaymentsResource extends Resource {
   }
 
   /** Returns the list of payments for the account. */
-  list(params?: { limit?: number; page?: number; sortBy?: string; orderBy?: "asc" | "desc"; dateFrom?: string; dateTo?: string }, options?: RequestOptions): Promise<PaginatedResponse<Payment>> {
-    return this.http.get<PaginatedResponse<Payment>>(
+  list(params?: { limit?: number; page?: number; sortBy?: string; orderBy?: "asc" | "desc"; dateFrom?: string; dateTo?: string }, options?: RequestOptions): Promise<PaginatedResponse<Payment.Payment>> {
+    return this.http.get<PaginatedResponse<Payment.Payment>>(
       "/v1/payment",
       params as QueryParams | undefined,
       options,
@@ -49,21 +43,21 @@ export class PaymentsResource extends Resource {
   }
 
   /** Returns a single payment by its `payment_id`. */
-  get(paymentId: number | string, options?: RequestOptions): Promise<Payment> {
-    return this.http.get<Payment>(`/v1/payment/${paymentId}`, undefined, options);
+  get(paymentId: number | string, options?: RequestOptions): Promise<Payment.Payment> {
+    return this.http.get<Payment.Payment>(`/v1/payment/${paymentId}`, undefined, options);
   }
 
   /** Returns a single invoice by its id. */
-  getInvoice(id: number | string, options?: RequestOptions): Promise<Invoice> {
-    return this.http.get<Invoice>(`/v1/invoice/${id}`, undefined, options);
+  getInvoice(id: number | string, options?: RequestOptions): Promise<Payment.Invoice> {
+    return this.http.get<Payment.Invoice>(`/v1/invoice/${id}`, undefined, options);
   }
 
   /**
    * Creates a new invoice (payment link) and returns the hosted invoice URL.
    * Authenticated with the API key.
    */
-  createInvoice(payload: CreateInvoicePayload, options?: RequestOptions): Promise<Invoice> {
-    return this.http.post<Invoice>(
+  createInvoice(payload: Payment.CreateInvoicePayload, options?: RequestOptions): Promise<Payment.Invoice> {
+    return this.http.post<Payment.Invoice>(
       "/v1/invoice",
       payload as unknown as Record<string, unknown>,
       options,
@@ -74,8 +68,8 @@ export class PaymentsResource extends Resource {
    * Returns the current account balances, keyed by currency ticker.
    * Authenticated with the API key.
    */
-  balance(options?: RequestOptions): Promise<AccountBalance> {
-    return this.http.get<AccountBalance>("/v1/balance", undefined, options);
+  balance(options?: RequestOptions): Promise<Payment.AccountBalance> {
+    return this.http.get<Payment.AccountBalance>("/v1/balance", undefined, options);
   }
 
   /**
@@ -83,10 +77,10 @@ export class PaymentsResource extends Resource {
    * Authenticated with the API key.
    */
   validateAddress(
-    payload: ValidateAddressPayload,
+    payload: Payment.ValidateAddressPayload,
     options?: RequestOptions,
-  ): Promise<ValidateAddressResponse> {
-    return this.http.post<ValidateAddressResponse>(
+  ): Promise<Payment.ValidateAddressResponse> {
+    return this.http.post<Payment.ValidateAddressResponse>(
       "/v1/payout/validate-address",
       payload as unknown as Record<string, unknown>,
       options,

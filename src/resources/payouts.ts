@@ -1,14 +1,9 @@
 import type { HttpClient, RequestOptions, QueryParams } from "../http.js";
 import type {
-  CryptoCurrency,
-  GetMinWithdrawalAmountResponse,
-  GetWithdrawalFeeResponse,
-  ListPayoutsParams,
   PaginatedResponse,
-  Payout,
-  VerifyBatchWithdrawalPayload,
-  VerifyBatchWithdrawalResponse,
+  CryptoCurrency,
 } from "../types/index.js";
+import type { Payout } from "../types/payouts.types.js";
 
 /** Base class for resource groups — holds a reference to the HTTP client. */
 abstract class Resource {
@@ -34,8 +29,8 @@ abstract class Resource {
  */
 export class PayoutsResource extends Resource {
   /** Creates a new payout (withdrawal). Requires JWT authentication. */
-  create(payload: { address: string; currency: CryptoCurrency; amount: number }, options?: RequestOptions): Promise<Payout> {
-    return this.http.post<Payout>(
+  create(payload: { address: string; currency: CryptoCurrency; amount: number }, options?: RequestOptions): Promise<Payout.Payout> {
+    return this.http.post<Payout.Payout>(
       "/v1/payout",
       payload as unknown as Record<string, unknown>,
       options,
@@ -44,10 +39,10 @@ export class PayoutsResource extends Resource {
 
   /** Returns the list of payouts. Requires JWT authentication. */
   list(
-    params?: ListPayoutsParams,
+    params?: Payout.ListParams,
     options?: RequestOptions,
-  ): Promise<PaginatedResponse<Payout>> {
-    return this.http.get<PaginatedResponse<Payout>>(
+  ): Promise<PaginatedResponse<Payout.Payout>> {
+    return this.http.get<PaginatedResponse<Payout.Payout>>(
       "/v1/payout",
       params as QueryParams | undefined,
       options,
@@ -55,8 +50,8 @@ export class PayoutsResource extends Resource {
   }
 
   /** Returns a single payout by its id. Requires JWT authentication. */
-  get(id: number | string, options?: RequestOptions): Promise<Payout> {
-    return this.http.get<Payout>(`/v1/payout/${id}`, undefined, options);
+  get(id: number | string, options?: RequestOptions): Promise<Payout.Payout> {
+    return this.http.get<Payout.Payout>(`/v1/payout/${id}`, undefined, options);
   }
 
   /**
@@ -65,10 +60,10 @@ export class PayoutsResource extends Resource {
    */
   verifyBatchWithdrawal(
     batchWithdrawalId: string,
-    payload: VerifyBatchWithdrawalPayload,
+    payload: Payout.VerifyBatchWithdrawalPayload,
     options?: RequestOptions,
-  ): Promise<VerifyBatchWithdrawalResponse> {
-    return this.http.post<VerifyBatchWithdrawalResponse>(
+  ): Promise<Payout.VerifyBatchWithdrawalResponse> {
+    return this.http.post<Payout.VerifyBatchWithdrawalResponse>(
       `/v1/payout/${batchWithdrawalId}/verify`,
       payload as unknown as Record<string, unknown>,
       options,
@@ -82,8 +77,8 @@ export class PayoutsResource extends Resource {
   getMinWithdrawalAmount(
     coin: CryptoCurrency,
     options?: RequestOptions,
-  ): Promise<GetMinWithdrawalAmountResponse> {
-    return this.http.get<GetMinWithdrawalAmountResponse>(
+  ): Promise<Payout.GetMinWithdrawalAmountResponse> {
+    return this.http.get<Payout.GetMinWithdrawalAmountResponse>(
       `/v1/payout-withdrawal/min-amount/${coin}`,
       undefined,
       options,
@@ -95,12 +90,12 @@ export class PayoutsResource extends Resource {
    * Requires API key authentication.
    */
   getFee(
-    params: { currency: CryptoCurrency; amount: number },
+    params: Payout.FeeParams,
     options?: RequestOptions,
-  ): Promise<GetWithdrawalFeeResponse> {
-    return this.http.get<GetWithdrawalFeeResponse>(
+  ): Promise<Payout.FeeResponse> {
+    return this.http.get<Payout.FeeResponse>(
       "/v1/payout/fee",
-      params as QueryParams,
+      params as unknown as QueryParams,
       options,
     );
   }

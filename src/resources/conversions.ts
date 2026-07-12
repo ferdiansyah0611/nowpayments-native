@@ -1,10 +1,5 @@
 import type { HttpClient, RequestOptions, QueryParams } from "../http.js";
-import type {
-  CreateConversionPayload,
-  ConversionResponse,
-  ListConversionsParams,
-  ListConversionsResponse,
-} from "../types/index.js";
+import type { Conversion } from "../types/conversions.types.js";
 
 /** Base class for resource groups — holds a reference to the HTTP client. */
 abstract class Resource {
@@ -26,8 +21,8 @@ export class ConversionResource extends Resource {
    * Creates a new currency conversion.
    * Requires JWT authentication.
    */
-  create(payload: CreateConversionPayload, options?: RequestOptions): Promise<ConversionResponse> {
-    return this.http.post<ConversionResponse>(
+  create(payload: Conversion.CreatePayload, options?: RequestOptions): Promise<Conversion.Response> {
+    return this.http.post<Conversion.Response>(
       "v1/conversion",
       payload as unknown as Record<string, unknown>,
       options,
@@ -38,8 +33,8 @@ export class ConversionResource extends Resource {
    * Gets a single conversion by its id.
    * Requires JWT authentication.
    */
-  get(conversionId: string, options?: RequestOptions): Promise<ConversionResponse> {
-    return this.http.get<ConversionResponse>(
+  get(conversionId: string, options?: RequestOptions): Promise<Conversion.Response> {
+    return this.http.get<Conversion.Response>(
       `v1/conversion/${conversionId}`,
       undefined,
       options,
@@ -50,8 +45,8 @@ export class ConversionResource extends Resource {
    * Lists conversions with optional filters.
    * Requires JWT authentication.
    */
-  list(params?: ListConversionsParams, options?: RequestOptions): Promise<ListConversionsResponse> {
-    return this.http.get<ListConversionsResponse>(
+  list(params?: Conversion.ListParams, options?: RequestOptions): Promise<Conversion.ListResponse> {
+    return this.http.get<Conversion.ListResponse>(
       "v1/conversion",
       params as QueryParams | undefined,
       options,

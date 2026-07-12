@@ -1,4 +1,4 @@
-import type { IpnNotification } from "./types/index.js";
+import type { IpnNotification } from "./types/main.types.js";
 
 /**
  * Recursively sorts an object's keys (and nested objects') in alphabetical

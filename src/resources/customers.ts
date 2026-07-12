@@ -1,23 +1,8 @@
 import type { HttpClient, RequestOptions, QueryParams } from "../http.js";
 import type {
-  CreateCustomerPaymentPayload,
-  CreateCustomerPayload,
-  CreateCustomerResponse,
-  CreateDepositResponse,
-  CustomerBalanceResponse,
-  CustomerPaymentsListResponse,
-  CustomersListResponse,
-  Deposit,
-  DepositListResponse,
-  DepositPayload,
-  ListTransfersParams,
-  Payment,
-  Transfer,
-  TransferListResponse,
-  TransferPayload,
-  WriteOffCreateResponse,
-  WriteOffPayload,
+  ListTransfersParams
 } from "../types/index.js";
+import type { Customer } from "../types/customers.types.js";
 
 /** Base class for resource groups — holds a reference to the HTTP client. */
 abstract class Resource {
@@ -70,8 +55,8 @@ export class CustomerResource extends Resource {
    * Returns the balance of a specific customer/sub-partner.
    * Authenticated with the API key.
    */
-  balance(customerId: string, options?: RequestOptions): Promise<CustomerBalanceResponse> {
-    return this.http.get<CustomerBalanceResponse>(
+  balance(customerId: string, options?: RequestOptions): Promise<Customer.BalanceResponse> {
+    return this.http.get<Customer.BalanceResponse>(
       `/v1/sub-partner/balance/${customerId}`,
       undefined,
       options,
@@ -82,8 +67,8 @@ export class CustomerResource extends Resource {
    * Returns the list of customers.
    * Authenticated with a JWT bearer token.
    */
-  list(params?: { limit?: number; offset?: number; order?: string }, options?: RequestOptions): Promise<CustomersListResponse> {
-    return this.http.get<CustomersListResponse>(
+  list(params?: { limit?: number; offset?: number; order?: string }, options?: RequestOptions): Promise<Customer.ListResponse> {
+    return this.http.get<Customer.ListResponse>(
       "/v1/sub-partner",
       params as QueryParams | undefined,
       options,
@@ -95,10 +80,10 @@ export class CustomerResource extends Resource {
    * Authenticated with a JWT bearer token.
    */
   create(
-    payload: CreateCustomerPayload,
+    payload: Customer.CreatePayload,
     options?: RequestOptions,
-  ): Promise<CreateCustomerResponse> {
-    return this.http.post<CreateCustomerResponse>(
+  ): Promise<Customer.CreateResponse> {
+    return this.http.post<Customer.CreateResponse>(
       "/v1/sub-partner",
       payload as unknown as Record<string, unknown>,
       options,
@@ -125,10 +110,10 @@ export class CustomerResource extends Resource {
    * Authenticated with a JWT bearer token.
    */
   createPayment(
-    payload: CreateCustomerPaymentPayload,
+    payload: Customer.CreatePaymentPayload,
     options?: RequestOptions,
-  ): Promise<Payment> {
-    return this.http.post<Payment>(
+  ): Promise<Customer.Payment> {
+    return this.http.post<Customer.Payment>(
       "/v1/sub-partner/payment",
       payload as unknown as Record<string, unknown>,
       options,
@@ -142,8 +127,8 @@ export class CustomerResource extends Resource {
   listPayments(
     params?: ListPaymentsCustomerParams,
     options?: RequestOptions,
-  ): Promise<CustomerPaymentsListResponse> {
-    return this.http.get<CustomerPaymentsListResponse>(
+  ): Promise<Customer.PaymentsListResponse> {
+    return this.http.get<Customer.PaymentsListResponse>(
       "/v1/sub-partner/payments",
       params as QueryParams | undefined,
       options,
@@ -155,10 +140,10 @@ export class CustomerResource extends Resource {
    * The actual information about the transfer's status can be obtained via Get transfer method.
    */
   createDeposits(
-    payload: DepositPayload,
+    payload: Customer.DepositPayload,
     options?: RequestOptions,
-  ): Promise<{ result: CreateDepositResponse }> {
-    return this.http.post<{ result: CreateDepositResponse }>(
+  ): Promise<{ result: Customer.CreateDepositResponse }> {
+    return this.http.post<{ result: Customer.CreateDepositResponse }>(
       "/v1/sub-partner/deposit",
       payload as unknown as Record<string, unknown>,
       options,
@@ -172,8 +157,8 @@ export class CustomerResource extends Resource {
   listDeposits(
     params?: { limit?: number; page?: number; id?: string; pay_currency?: string; status?: string; sub_partner_id?: string; date_from?: string; date_to?: string; orderBy?: "asc" | "desc"; sortBy?: "id" | "status" | "pay_currency" | "created_at" | "updated_at" },
     options?: RequestOptions,
-  ): Promise<DepositListResponse> {
-    return this.http.get<DepositListResponse>(
+  ): Promise<Customer.DepositListResponse> {
+    return this.http.get<Customer.DepositListResponse>(
       "/v1/sub-partner/deposit",
       params as QueryParams | undefined,
       options,
@@ -184,8 +169,8 @@ export class CustomerResource extends Resource {
    * Returns a single deposit by its id.
    * Authenticated with a JWT bearer token.
    */
-  getDeposit(depositId: number | string, options?: RequestOptions): Promise<Deposit> {
-    return this.http.get<Deposit>(`/v1/sub-partner/deposit/${depositId}`, undefined, options);
+  getDeposit(depositId: number | string, options?: RequestOptions): Promise<Customer.Deposit> {
+    return this.http.get<Customer.Deposit>(`/v1/sub-partner/deposit/${depositId}`, undefined, options);
   }
 
   /**
@@ -193,10 +178,10 @@ export class CustomerResource extends Resource {
    * Authenticated with a JWT bearer token.
    */
   createTransfers(
-    params: TransferPayload,
+    params: Customer.TransferPayload,
     options?: RequestOptions,
-  ): Promise<WriteOffCreateResponse> {
-    return this.http.post<WriteOffCreateResponse>(
+  ): Promise<Customer.WriteOffCreateResponse> {
+    return this.http.post<Customer.WriteOffCreateResponse>(
       "/v1/sub-partner/transfer",
       params as unknown as Record<string, unknown>,
       options,
@@ -210,8 +195,8 @@ export class CustomerResource extends Resource {
   listTransfers(
     params?: ListTransfersParams,
     options?: RequestOptions,
-  ): Promise<TransferListResponse> {
-    return this.http.get<TransferListResponse>(
+  ): Promise<Customer.TransferListResponse> {
+    return this.http.get<Customer.TransferListResponse>(
       "/v1/sub-partner/transfer",
       params as QueryParams | undefined,
       options,
@@ -222,18 +207,18 @@ export class CustomerResource extends Resource {
    * Returns a single transfer by its id.
    * Authenticated with a JWT bearer token.
    */
-  getTransfer(transferId: number | string, options?: RequestOptions): Promise<Transfer> {
-    return this.http.get<Transfer>(`/v1/sub-partner/transfer/${transferId}`, undefined, options);
+  getTransfer(transferId: number | string, options?: RequestOptions): Promise<Customer.Transfer> {
+    return this.http.get<Customer.Transfer>(`/v1/sub-partner/transfer/${transferId}`, undefined, options);
   }
 
   /**
    * With this method you can withdraw funds from a customer's account and transfer them to your master account.
    */
   createWriteOff(
-    payload: WriteOffPayload,
+    payload: Customer.WriteOffPayload,
     options?: RequestOptions,    
-  ): Promise<WriteOffCreateResponse> {
-    return this.http.post<WriteOffCreateResponse>(
+  ): Promise<Customer.WriteOffCreateResponse> {
+    return this.http.post<Customer.WriteOffCreateResponse>(
       "/v1/sub-partner/write-off",
       payload  as unknown as Record<string, unknown>,
       options,
