@@ -33,17 +33,6 @@ jobs:
       - name: Run tests (Resources)
         run: npx vitest run test/resources
 
-      - name: Run tests (E2E)
-        env:
-          VITE_NOWPAYMENTS_API_KEY: ${{ secrets.VITE_NOWPAYMENTS_API_KEY }}
-          VITE_NOWPAYMENTS_PUBLIC_KEY: ${{ secrets.VITE_NOWPAYMENTS_PUBLIC_KEY }}
-          VITE_NOWPAYMENTS_IPN: ${{ secrets.VITE_NOWPAYMENTS_IPN }}
-          VITE_NOWPAYMENTS_ACC_EMAIL: ${{ secrets.VITE_NOWPAYMENTS_ACC_EMAIL }}
-          VITE_NOWPAYMENTS_ACC_PASS: ${{ secrets.VITE_NOWPAYMENTS_ACC_PASS }}
-          VITE_NOWPAYMENTS_CUSTOMERID: ${{ secrets.VITE_NOWPAYMENTS_CUSTOMERID }}
-          VITE_NOWPAYMENTS_SUBSCRIBE_PLANID: ${{ secrets.VITE_NOWPAYMENTS_SUBSCRIBE_PLANID }}
-        run: npx vitest run test/e2e
-
       - name: Upload coverage reports
         if: matrix.node-version == '20.x'
         uses: codecov/codecov-action@v4

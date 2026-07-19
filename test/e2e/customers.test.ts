@@ -15,7 +15,7 @@ describe("CustomerResource E2E tests", () => {
     token = await getToken();
   });
 
-  describe.only("balance", () => {
+  describe("balance", () => {
     it("should call GET /v1/sub-partner/balance/:id", async () => {
       const response = await client.customers.balance(customerId, withAuthorization(token));
 
@@ -23,7 +23,7 @@ describe("CustomerResource E2E tests", () => {
       expect(response.result).toBeDefined();
     });
   });
-  describe.skip("create", () => {
+  describe("create", () => {
     it("should call POST /v1/sub-partner with customer payload", async () => {
 
       const response = await client.customers.create({ name: 'John Doe' }, withAuthorization(token));
@@ -33,7 +33,7 @@ describe("CustomerResource E2E tests", () => {
   });
 
 
-  describe.only("list", () => {
+  describe("list", () => {
     it("should call GET /v1/sub-partner with default params", async () => {
       const response = await client.customers.list(undefined, withAuthorization(token));
 
@@ -54,7 +54,7 @@ describe("CustomerResource E2E tests", () => {
     });
   });
 
-  describe.only("createPayment", () => {
+  describe("createPayment", () => {
     it("should call POST /v1/sub-partner/payment with payment payload", async () => {
       const payload: Customer.CreatePaymentPayload = {
         sub_partner_id: customerId,
@@ -73,7 +73,7 @@ describe("CustomerResource E2E tests", () => {
     });
   });
 
-  describe.only("listPayments", () => {
+  describe("listPayments", () => {
     it("should call GET /v1/sub-partner/payments with default params", async () => {
       const response = await client.customers.listPayments(undefined, withAuthorization(token));
 
@@ -93,7 +93,7 @@ describe("CustomerResource E2E tests", () => {
     });
   });
 
-  describe.only("createDeposits", () => {
+  describe("createDeposits", () => {
     it("should call POST /v1/sub-partner/deposit with deposit payload", async () => {
       const payload: Customer.DepositPayload = {
         sub_partner_id: "customer-123",
@@ -109,7 +109,7 @@ describe("CustomerResource E2E tests", () => {
     });
   });
 
-  describe.only("createTransfers", () => {
+  describe("createTransfers", () => {
     it("should call POST /v1/sub-partner/transfer with transfer payload", async () => {
       const payload: Customer.TransferPayload = {
         from_id: "customer-123",
@@ -128,7 +128,7 @@ describe("CustomerResource E2E tests", () => {
     });
   });
 
-  describe.only("listTransfers", () => {
+  describe("listTransfers", () => {
     it("should call GET /v1/sub-partner/transfer with default params", async () => {
       const response = await client.customers.listTransfers(undefined, withAuthorization(token));
 
@@ -148,7 +148,7 @@ describe("CustomerResource E2E tests", () => {
     });
   });
 
-  describe.only("getTransfer", () => {
+  describe("getTransfer", () => {
     it("should call GET /v1/sub-partner/transfer/:id", async () => {
       try {
         await client.customers.getTransfer(transferId, withAuthorization(token));
@@ -158,7 +158,7 @@ describe("CustomerResource E2E tests", () => {
     });
   });
 
-  describe.only("createWriteOff", () => {
+  describe("createWriteOff", () => {
     it("should call POST /v1/sub-partner/write-off with write-off payload", async () => {
       const payload: Customer.WriteOffPayload = {
         sub_partner_id: customerId,
