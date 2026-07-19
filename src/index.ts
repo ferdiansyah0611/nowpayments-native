@@ -34,9 +34,10 @@ export {
   PaymentsResource,
   PayoutsResource,
   SubscriptionResource,
+  ConversionResource,
 } from "./resources/index.js";
 
 export { verifyIpnSignature, sortObject } from "./ipn.js";
 
-export type * from "./types.js";
+export type * from "./types/index.js";
 export type { IpnNotification } from "./ipn.js";

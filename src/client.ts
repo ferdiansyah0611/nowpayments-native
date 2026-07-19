@@ -6,6 +6,7 @@ import {
   PaymentsResource,
   PayoutsResource,
   SubscriptionResource,
+  ConversionResource,
 } from "./resources/index.js";
 
 /** Options accepted by the {@link NowPayments} client constructor. */
@@ -46,6 +47,7 @@ export class NowPayments {
   public readonly payouts: PayoutsResource;
   public readonly customers: CustomerResource;
   public readonly subscriptions: SubscriptionResource;
+  public readonly conversions: ConversionResource;
 
   constructor(options: NowPaymentsOptions = {}) {
     const config: HttpClientConfig = {
@@ -69,6 +71,7 @@ export class NowPayments {
     this.payouts = new PayoutsResource(this.http);
     this.customers = new CustomerResource(this.http);
     this.subscriptions = new SubscriptionResource(this.http);
+    this.conversions = new ConversionResource(this.http);
   }
 
   /** Returns a new client authenticated with the given JWT. */

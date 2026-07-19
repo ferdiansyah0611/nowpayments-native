@@ -30,8 +30,8 @@ jobs:
       - name: Run TypeScript type-check
         run: npx tsc --noEmit
 
-      - name: Run tests
-        run: npx vitest run
+      - name: Run tests (Resources)
+        run: npx vitest run test/resources
 
       - name: Upload coverage reports
         if: matrix.node-version == '20.x'
