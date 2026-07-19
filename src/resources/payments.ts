@@ -1,16 +1,9 @@
-import type { HttpClient, RequestOptions, QueryParams } from "../http.js";
+import type { RequestOptions, QueryParams } from "../http.js";
 import type {
   PaginatedResponse
 } from "../types/index.js";
 import type { Payment } from "../types/payments.types.js";
-
-/** Base class for resource groups — holds a reference to the HTTP client. */
-abstract class Resource {
-  protected readonly http: HttpClient;
-  constructor(http: HttpClient) {
-    this.http = http;
-  }
-}
+import { Resource } from "./main.js";
 
 /**
  * Payment endpoints.
@@ -19,12 +12,15 @@ abstract class Resource {
  * - `GET /v1/payment` — list payments.
  * - `GET /v1/payment/{id}` — get a single payment by id.
  * - `POST /v1/invoice` — create an invoice (payment link).
- * - `GET /v1/invoice/{id}` — get a single invoice.
  * - `GET /v1/balance` — account balances.
  * - `POST /v1/payout/validate-address` — validate a payout address.
  */
 export class PaymentsResource extends Resource {
-  /** Creates a new payment and returns the deposit address. */
+  /** 
+   * Creates payment. With this method, your customer will be able to complete the payment without leaving your website.
+   * Be sure to consider the details of repeated and wrong-asset deposits from 'Repeated Deposits and Wrong-Asset Deposits' section when processing payments.
+   * @requires APIKey
+  */
   create(payload: Payment.CreatePayload, options?: RequestOptions): Promise<Payment.Payment> {
     return this.http.post<Payment.Payment>(
       "/v1/payment",
@@ -33,8 +29,12 @@ export class PaymentsResource extends Resource {
     );
   }
 
-  /** Returns the list of payments for the account. */
-  list(params?: { limit?: number; page?: number; sortBy?: string; orderBy?: "asc" | "desc"; dateFrom?: string; dateTo?: string }, options?: RequestOptions): Promise<PaginatedResponse<Payment.Payment>> {
+  /**
+   * Returns the entire list of all transactions created with certain API key.
+   * @requires JWT
+   * @requires APIKey
+   */
+  list(params?: Payment.ListParams, options?: RequestOptions): Promise<PaginatedResponse<Payment.Payment>> {
     return this.http.get<PaginatedResponse<Payment.Payment>>(
       "/v1/payment",
       params as QueryParams | undefined,
@@ -42,19 +42,17 @@ export class PaymentsResource extends Resource {
     );
   }
 
-  /** Returns a single payment by its `payment_id`. */
+  /**
+   * Get the actual information about the payment. You need to provide the ID of the payment in the request.
+   * @requires APIKey
+   */
   get(paymentId: number | string, options?: RequestOptions): Promise<Payment.Payment> {
     return this.http.get<Payment.Payment>(`/v1/payment/${paymentId}`, undefined, options);
   }
 
-  /** Returns a single invoice by its id. */
-  getInvoice(id: number | string, options?: RequestOptions): Promise<Payment.Invoice> {
-    return this.http.get<Payment.Invoice>(`/v1/invoice/${id}`, undefined, options);
-  }
-
   /**
-   * Creates a new invoice (payment link) and returns the hosted invoice URL.
-   * Authenticated with the API key.
+   * Creates a payment link. With this method, the customer is required to follow the generated url to complete the payment. Data must be sent as a JSON-object payload.
+   * @requires APIKey
    */
   createInvoice(payload: Payment.CreateInvoicePayload, options?: RequestOptions): Promise<Payment.Invoice> {
     return this.http.post<Payment.Invoice>(
@@ -65,16 +63,16 @@ export class PaymentsResource extends Resource {
   }
 
   /**
-   * Returns the current account balances, keyed by currency ticker.
-   * Authenticated with the API key.
+   * This method returns your balance in different currencies.
+   * @requires APIKey
    */
   balance(options?: RequestOptions): Promise<Payment.AccountBalance> {
     return this.http.get<Payment.AccountBalance>("/v1/balance", undefined, options);
   }
 
   /**
-   * Validates whether a payout address is valid for the given currency.
-   * Authenticated with the API key.
+   * This endpoint allows you to check if your payout address is valid and funds can be received there.
+   * @requires APIKey
    */
   validateAddress(
     payload: Payment.ValidateAddressPayload,

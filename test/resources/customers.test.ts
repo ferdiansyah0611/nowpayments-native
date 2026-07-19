@@ -77,29 +77,6 @@ describe("NowPayments - Customers", () => {
     });
   });
 
-  describe("customers.createRecurringPayment", () => {
-    it("POSTs to /v1/sub-partner/recurring", async () => {
-      const fetchImpl = vi.fn(async (url: string, init?: RequestInit) => {
-        expect(url).toContain("/v1/sub-partner/recurring");
-        expect(init?.method).toBe("POST");
-        const body = JSON.parse(init?.body as string);
-        expect(body).toMatchObject({ customer_id: "111394288", amount: "50", currency: "usdttrc20" });
-        return jsonResponse({
-          result: { id: "987654321", status: "CREATED", amount: "50", currency: "usdttrc20" },
-        });
-      }) as unknown as typeof fetch;
-
-      const c = new NowPayments({ jwt: "my-jwt", fetchImpl });
-      const result = await c.customers.createRecurringPayment({
-        customer_id: "111394288",
-        amount: "50",
-        currency: "usdttrc20",
-      });
-      expect(result.result.id).toBe("987654321");
-      expect(result.result.status).toBe("CREATED");
-    });
-  });
-
   describe("customer.createPayment", () => {
     it("POSTs to /v1/sub-partner/payment with JWT auth", async () => {
       const fetchImpl = vi.fn(async (url: string, init?: RequestInit) => {
@@ -108,22 +85,29 @@ describe("NowPayments - Customers", () => {
         const body = JSON.parse(init?.body as string);
         expect(body).toMatchObject({
           sub_partner_id: "123",
-          price_amount: 10,
-          price_currency: "usd",
-          pay_currency: "btc",
+          amount: 50,
+          currency: "trx",
+          is_fixed_rate: false,
+          is_fee_paid_by_user: false,
+          ipn_callback_url: ''
         });
-        return jsonResponse({ payment_id: 1, pay_address: "0xabc" });
+        return jsonResponse({
+          result: {
+            pay_amount: body.amount
+          }
+        });
       }) as unknown as typeof fetch;
 
       const c = new NowPayments({ jwt: "my-jwt", fetchImpl });
-      const result = await c.customers.createPayment({
+      const response = await c.customers.createPayment({
         sub_partner_id: "123",
-        price_amount: 10,
-        price_currency: "usd",
-        pay_currency: "btc",
+        amount: 50,
+        currency: "trx",
+        is_fixed_rate: false,
+        is_fee_paid_by_user: false,
+        ipn_callback_url: ''
       });
-      expect(result.payment_id).toBe(1);
-      expect(result.pay_address).toBe("0xabc");
+      expect(response.result.pay_amount).toBe(50);
     });
   });
 
@@ -162,9 +146,8 @@ describe("NowPayments - Customers", () => {
         });
         return jsonResponse({
           result: {
-            id: "19649354",
-            from_sub_id: "5209391548",
-            to_sub_id: "123",
+            pay_address: "19649354",
+            pay_currency: "trx"
           },
         });
       }) as unknown as typeof fetch;
@@ -175,9 +158,8 @@ describe("NowPayments - Customers", () => {
         currency: "usdt",
         sub_partner_id: "123",
       });
-      expect(response.result.id).toBe("19649354");
-      expect(response.result.from_sub_id).toBe("5209391548");
-      expect(response.result.to_sub_id).toBe("123");
+      expect(response.result.pay_address).toBe("19649354");
+      expect(response.result.pay_currency).toBe("trx");
     });
   });
 
@@ -190,7 +172,7 @@ describe("NowPayments - Customers", () => {
         expect(body).toMatchObject({
           from_id: "123",
           to_id: "456",
-          amount: 10,
+          amount: "10",
           currency: "usd",
         });
         return jsonResponse({
@@ -202,7 +184,7 @@ describe("NowPayments - Customers", () => {
       const response = await c.customers.createTransfers({
         from_id: "123",
         to_id: "456",
-        amount: 10,
+        amount: '10',
         currency: "usd",
       });
       expect(response.result.id).toBe("1");
@@ -242,14 +224,14 @@ describe("NowPayments - Customers", () => {
         expect(init?.headers).toMatchObject({ Authorization: "Bearer my-jwt" });
         return jsonResponse({
           id: 42,
-          payment_status: "finished",
+          status: "finished",
         });
       }) as unknown as typeof fetch;
 
       const c = new NowPayments({ jwt: "my-jwt", fetchImpl });
       const result = await c.customers.getTransfer(42);
       expect(result.id).toBe(42);
-      expect(result.payment_status).toBe("finished");
+      expect(result.status).toBe("finished");
     });
   });
 

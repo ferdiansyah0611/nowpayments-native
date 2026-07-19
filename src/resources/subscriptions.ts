@@ -1,13 +1,6 @@
-import type { HttpClient, RequestOptions, QueryParams } from "../http.js";
+import type { RequestOptions, QueryParams } from "../http.js";
 import type { Subscription } from "../types/subscriptions.types.js";
-
-/** Base class for resource groups — holds a reference to the HTTP client. */
-abstract class Resource {
-  protected readonly http: HttpClient;
-  constructor(http: HttpClient) {
-    this.http = http;
-  }
-}
+import { Resource } from "./main.js";
 
 /**
  * Email subscriptions (recurring payments) endpoints.
@@ -33,8 +26,8 @@ abstract class Resource {
  */
 export class SubscriptionResource extends Resource {
   /**
-   * Creates a new subscription plan.
-   * Authenticated with a JWT bearer token.
+   * This is the method to create a Recurring Payments plan. Every plan has its unique ID which is required for generating separate payments.
+   * @requires JWT
    */
   createPlan(
     payload: Subscription.CreatePlanPayload,
@@ -48,8 +41,8 @@ export class SubscriptionResource extends Resource {
   }
 
   /**
-   * Gets a single subscription plan by its id.
-   * Requires API key authentication.
+   * This method allows you to obtain information about your payment plan (you need to specify your payment plan id in the request).
+   * @requires APIKey
    */
   getPlan(id: string, options?: RequestOptions): Promise<Subscription.PlanResponse> {
     return this.http.get<Subscription.PlanResponse>(
@@ -60,8 +53,8 @@ export class SubscriptionResource extends Resource {
   }
 
   /**
-   * Lists all subscription plans.
-   * Requires API key authentication.
+   * This method allows you to obtain information about all the payment plans you’ve created.
+   * @requires APIKey
    */
   getAllPlans(
     params?: Subscription.ListPlansParams,
@@ -75,8 +68,9 @@ export class SubscriptionResource extends Resource {
   }
 
   /**
-   * Updates an existing subscription plan.
-   * Authenticated with a JWT bearer token.
+   * This method allows you to add necessary changes to a created plan. 
+   * They won’t affect users who have already paid; however, the changes will take effect when a new payment is to be made.
+   * @requires JWT
    */
   updatePlan(
     id: string,
@@ -91,8 +85,10 @@ export class SubscriptionResource extends Resource {
   }
 
   /**
-   * Creates a new subscription payment.
-   * Authenticated with API key or JWT.
+   * This method allows you to send payment links to your customers via email. 
+   * A day before the paid period ends, the customer receives a new letter with a new payment link.
+   * @requires JWT
+   * @requires APIKey
    */
   createPayment(
     payload: Subscription.CreatePayload,
@@ -106,8 +102,8 @@ export class SubscriptionResource extends Resource {
   }
 
   /**
-   * Lists subscription payments with optional filters.
-   * Requires API key authentication.
+   * The method allows you to view the entire list of recurring payments filtered by payment status and/or payment plan id
+   * @requires APIKey
    */
   listPayments(
     params?: Subscription.ListParams,
@@ -121,8 +117,8 @@ export class SubscriptionResource extends Resource {
   }
 
   /**
-   * Gets a single subscription payment by its id.
-   * Requires API key authentication.
+   * Get information about a particular recurring payment via its ID.
+   * @requires APIKey
    */
   getPayment(id: string, options?: RequestOptions): Promise<Subscription.Response> {
     return this.http.get<Subscription.Response>(
@@ -133,8 +129,9 @@ export class SubscriptionResource extends Resource {
   }
 
   /**
-   * Cancels a subscription payment by its id.
-   * Authenticated with a JWT bearer token.
+   * Completely removes a particular payment from the recurring payment plan.
+   * You need to specify the payment plan id in the request.
+   * @requires JWT
    */
   cancelPayment(id: string, options?: RequestOptions): Promise<Subscription.Response> {
     return this.http.delete<Subscription.Response>(

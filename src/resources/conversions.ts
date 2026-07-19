@@ -1,13 +1,6 @@
-import type { HttpClient, RequestOptions, QueryParams } from "../http.js";
+import type { RequestOptions, QueryParams } from "../http.js";
 import type { Conversion } from "../types/conversions.types.js";
-
-/** Base class for resource groups — holds a reference to the HTTP client. */
-abstract class Resource {
-  protected readonly http: HttpClient;
-  constructor(http: HttpClient) {
-    this.http = http;
-  }
-}
+import { Resource } from "./main.js";
 
 /**
  * Currency conversion endpoints.
@@ -18,8 +11,8 @@ abstract class Resource {
  */
 export class ConversionResource extends Resource {
   /**
-   * Creates a new currency conversion.
-   * Requires JWT authentication.
+   * This endpoint allows you to create conversions within your custody account.
+   * @requires JWT
    */
   create(payload: Conversion.CreatePayload, options?: RequestOptions): Promise<Conversion.Response> {
     return this.http.post<Conversion.Response>(
@@ -30,8 +23,8 @@ export class ConversionResource extends Resource {
   }
 
   /**
-   * Gets a single conversion by its id.
-   * Requires JWT authentication.
+   * This method allows you to check the status of a certain conversion.
+   * @requires JWT
    */
   get(conversionId: string, options?: RequestOptions): Promise<Conversion.Response> {
     return this.http.get<Conversion.Response>(
@@ -42,8 +35,8 @@ export class ConversionResource extends Resource {
   }
 
   /**
-   * Lists conversions with optional filters.
-   * Requires JWT authentication.
+   * This endpoint returns you the list of your conversions with the essential info for each one.
+   * @requires JWT
    */
   list(params?: Conversion.ListParams, options?: RequestOptions): Promise<Conversion.ListResponse> {
     return this.http.get<Conversion.ListResponse>(

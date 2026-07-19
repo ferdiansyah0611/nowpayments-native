@@ -1,33 +1,26 @@
-import type { HttpClient, RequestOptions } from "../http.js";
-import type { ApiStatus, AuthPayload, AuthStatus, JwtToken } from "../types/main.types.js";
-
-/** Base class for resource groups — holds a reference to the HTTP client. */
-abstract class Resource {
-  protected readonly http: HttpClient;
-  constructor(http: HttpClient) {
-    this.http = http;
-  }
-}
+import type { RequestOptions } from "../http.js";
+import type { ApiStatus, AuthPayload, JwtToken } from "../types/main.types.js";
+import { Resource } from "./main.js";
 
 /**
  * Authentication & API status endpoints.
  *
  * - `GET /v1/status` — public API health check (no auth required).
  * - `POST /v1/auth` — exchange email/password for a JWT bearer token.
- * - `GET /v1/auth/decoded` — validate the configured API key.
  */
 export class AuthResource extends Resource {
-  /** Checks API availability. Public endpoint, no API key required. */
+  /** 
+   * This is a method to get information about the current state of the API. 
+   * If everything is OK, you will receive an "OK" message. Otherwise, you'll see some error.
+  */
   status(options?: RequestOptions): Promise<ApiStatus> {
     return this.http.get<ApiStatus>("/v1/status", undefined, options);
   }
 
-  /** Validates the configured API key. */
-  apiKeyStatus(options?: RequestOptions): Promise<AuthStatus> {
-    return this.http.get<AuthStatus>("/v1/auth/decoded", undefined, options);
-  }
-
-  /** Exchanges email/password for a JWT bearer token. */
+  /**
+   * Authentication method for obtaining a JWT token. You should specify your email and password which you are using for signing in into dashboard.
+   * JWT token will be required for using 'Get list of payments' and 'Create payout' endpoints. For security reasons, JWT tokens expire in 5 minutes.
+   */
   token(payload: AuthPayload, options?: RequestOptions): Promise<JwtToken> {
     return this.http.post<JwtToken>(
       "/v1/auth",

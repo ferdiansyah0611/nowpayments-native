@@ -24,6 +24,12 @@ export type PaymentStatus =
   | "refunded"
   | "expired";
 
+export type TransactionStatus =
+  | "CREATED"
+  | "WAITING"
+  | "FINISHED"
+  | "REJECTED";
+
 /** Generic pagination wrapper returned by list endpoints. */
 export interface PaginatedResponse<T> {
   data: T[];
@@ -73,7 +79,7 @@ export interface ListTransfersParams {
   status: ListTransfersStatus;
   limit: number;
   offset: number;
-  order: 'ASC' | 'DESC';
+  order?: 'ASC' | 'DESC';
 }
 
 /** Parameters for listing write offs. */
@@ -98,15 +104,6 @@ export type ListTransfersStatus = "WAITING"|"CREATED"|"FINISHED"|"REJECTED";
 export interface ApiStatus {
   /** Status message, e.g. "OK". */
   message: string;
-}
-
-/** Authentication status response (returned by `GET /v1/auth/decoded`). */
-export interface AuthStatus {
-  /** Whether the API key is valid. */
-  result: boolean;
-  /** Message describing the result. */
-  message?: string;
-  code?: number;
 }
 
 /** JWT token response from `/auth`. */

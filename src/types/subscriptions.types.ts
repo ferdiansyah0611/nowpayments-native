@@ -20,8 +20,8 @@ export namespace Subscription {
     /** Whether the subscription is currently active. */
     is_active: boolean;
     subscriber: {
-      /** Customer email charged by the subscription. */
-      email: string;
+      email?: string;
+      sub_partner_id?: string;
     };
     /** Expiration date of the subscription. */
     expire_date: string;
@@ -70,32 +70,14 @@ export namespace Subscription {
     sub_partner_id?: string;
   }
 
-  /** A single subscription record (recurring payment). */
-  export interface Subscription {
-    /** Subscription id. */
-    id: string;
-    /** ID of the payment plan. */
-    subscription_plan_id: string | number;
-    /** Whether the subscription is active. */
-    is_active: boolean;
-    /** Current payment status. */
-    status: PaymentStatus;
-    /** Expiration date of the subscription. */
-    expire_date: string;
-    /** Subscriber information. */
-    subscriber: Subscriber;
-    /** ISO 8601 creation timestamp. */
-    created_at: string;
-    /** ISO 8601 last-update timestamp. */
-    updated_at: string;
-  }
-
   /** Payload to create a new subscription (`POST v1/subscriptions`). */
   export interface CreatePayload {
     /** ID of the payment plan. */
     subscription_plan_id: string | number;
     /** Customer email to send payment links to. */
     email: string;
+    /** Customer id */
+    sub_partner_id?: number;
   }
 
   /** Parameters for listing subscriptions. */

@@ -1,17 +1,10 @@
-import type { HttpClient, RequestOptions, QueryParams } from "../http.js";
+import type { RequestOptions, QueryParams } from "../http.js";
 import type {
   PaginatedResponse,
   CryptoCurrency,
 } from "../types/index.js";
 import type { Payout } from "../types/payouts.types.js";
-
-/** Base class for resource groups — holds a reference to the HTTP client. */
-abstract class Resource {
-  protected readonly http: HttpClient;
-  constructor(http: HttpClient) {
-    this.http = http;
-  }
-}
+import { Resource } from "./main.js";
 
 /**
  * Payout endpoints.
@@ -28,16 +21,24 @@ abstract class Resource {
  * Account balances (`GET /v1/balance`) live on {@link PaymentsResource.balance}.
  */
 export class PayoutsResource extends Resource {
-  /** Creates a new payout (withdrawal). Requires JWT authentication. */
-  create(payload: { address: string; currency: CryptoCurrency; amount: number }, options?: RequestOptions): Promise<Payout.Payout> {
-    return this.http.post<Payout.Payout>(
+  /**
+   * This method is used for crypto payouts only. Please note that payouts can be requested only using a whitelisted IP address, 
+   * and to whitelisted wallet addresses. It's a security measure enabled for each partner account by default.
+   * @requires JWT
+   * @requires APIKey
+  */
+  create(payload: Payout.CreatePayload, options?: RequestOptions): Promise<Payout.CreateResponse> {
+    return this.http.post<Payout.CreateResponse>(
       "/v1/payout",
-      payload as unknown as Record<string, unknown>,
+      JSON.stringify(payload) as unknown as Record<string, unknown>,
       options,
     );
   }
 
-  /** Returns the list of payouts. Requires JWT authentication. */
+  /**
+   * This endpoint allows you to get a list of your payouts.
+   * @requires APIKey
+  */
   list(
     params?: Payout.ListParams,
     options?: RequestOptions,
@@ -49,14 +50,20 @@ export class PayoutsResource extends Resource {
     );
   }
 
-  /** Returns a single payout by its id. Requires JWT authentication. */
+  /**
+   * Get the actual information about the payout. You need to provide the ID of the payout in the request.
+   * @requires APIKey
+  */
   get(id: number | string, options?: RequestOptions): Promise<Payout.Payout> {
     return this.http.get<Payout.Payout>(`/v1/payout/${id}`, undefined, options);
   }
 
   /**
-   * Verifies a batch withdrawal with a 2FA code.
-   * Requires JWT authentication.
+   * This method is required to verify payouts by using your 2FA code.
+   * You’ll have 10 attempts to verify the payout. If it is not verified after 10 attempts, the payout will remain in ‘creating’ status.
+   * Payout will be processed only when it is verified.
+   * @requires JWT
+   * @requires APIKey
    */
   verifyBatchWithdrawal(
     batchWithdrawalId: string,
@@ -71,8 +78,8 @@ export class PayoutsResource extends Resource {
   }
 
   /**
-   * Gets the minimum withdrawal amount for a specific coin.
-   * Requires API key authentication.
+   * This endpoint shows you current minimal amount for withdrawals.
+   * @requires APIKey
    */
   getMinWithdrawalAmount(
     coin: CryptoCurrency,
@@ -86,11 +93,11 @@ export class PayoutsResource extends Resource {
   }
 
   /**
-   * Gets the withdrawal fee for a specific currency and amount.
-   * Requires API key authentication.
+   * This endpoint will show you the estimated amount of network fee for payout.
+   * @requires APIKey
    */
   getFee(
-    params: Payout.FeeParams,
+    params?: Payout.FeeParams,
     options?: RequestOptions,
   ): Promise<Payout.FeeResponse> {
     return this.http.get<Payout.FeeResponse>(
@@ -101,18 +108,20 @@ export class PayoutsResource extends Resource {
   }
 
   /**
-   * Cancels a payout by its id.
-   * Requires JWT authentication.
+   * This method allows you to cancel a scheduled/recurring payout that was previously created with the execute_at parameter. 
+   * Only payouts that are scheduled in advance can be canceled using this endpoint. 
+   * Once canceled, the payout will receive the status cancelled.
+   * @requires JWT
    */
   cancel(id: number | string, options?: RequestOptions): Promise<void> {
-    return this.http.delete<void>(`/v1/payout/${id}`, undefined, options);
+    return this.http.post<void>(`/v1/payout/${id}/cancel`, undefined, options);
   }
 
   /**
-   * Cancels a payout batch by its batch ID.
-   * Requires JWT authentication.
+   * This endpoint allows you to cancel an entire recurring payout batch.
+   * @requires JWT
    */
   cancelBatch(batchId: string, options?: RequestOptions): Promise<void> {
-    return this.http.delete<void>(`/v1/payout/${batchId}/cancel-batch`, undefined, options);
+    return this.http.post<void>(`/v1/payout/${batchId}/cancel-batch`, undefined, options);
   }
 }

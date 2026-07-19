@@ -38,17 +38,4 @@ describe("NowPayments - Auth", () => {
       expect(result.message).toBe("OK");
     });
   });
-
-  describe("auth.apiKeyStatus", () => {
-    it("sends the API key header and parses the response", async () => {
-      const fetchImpl = vi.fn(async (_url: string, init?: RequestInit) => {
-        expect(init?.headers).toMatchObject({ "x-api-key": "test-key" });
-        return jsonResponse({ result: true, message: "ok" });
-      }) as unknown as typeof fetch;
-
-      const c = new NowPayments({ apiKey: "test-key", fetchImpl });
-      const result = await c.auth.apiKeyStatus();
-      expect(result.result).toBe(true);
-    });
-  });
 });

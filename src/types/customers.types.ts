@@ -2,7 +2,14 @@
  * Customer management (sub-partner) types for the NowPayments API.
  */
 
-import type { CryptoCurrency, FiatCurrency, Money, PaymentStatus, ListTransfersStatus } from "./main.types.js";
+import type {
+  CryptoCurrency,
+  FiatCurrency,
+  Money,
+  PaymentStatus,
+  ListTransfersStatus,
+  TransactionStatus,
+} from "./main.types.js";
 
 export namespace Customer {
   /** Balance for a single currency held by a customer/sub-partner. */
@@ -53,7 +60,7 @@ export namespace Customer {
 
   /** Created customer response (returned by `POST /v1/sub-partner`). */
   export interface CreateResponse {
-    result: Pick<Customer, "id" | "name" | "created_at">;
+    result: Customer;
   }
 
   /** Payload to create a recurring payment for a customer. */
@@ -67,7 +74,11 @@ export namespace Customer {
   }
 
   /** Recurring payment status. */
-  export type RecurringPaymentStatus = "CREATED" | "PROCESSING" | "DONE" | "FAILED";
+  export type RecurringPaymentStatus =
+    | "CREATED"
+    | "PROCESSING"
+    | "DONE"
+    | "FAILED";
 
   /** Created recurring payment response. */
   export interface CreateRecurringPaymentResponse {
@@ -89,24 +100,6 @@ export namespace Customer {
     limit?: number;
     /** Sort direction. */
     order?: "ASC" | "DESC";
-  }
-
-  /** Payload to create a payment for a customer. */
-  export interface CreatePaymentPayload {
-    /** Customer id. */
-    sub_partner_id: string;
-    /** Amount to pay in fiat currency. */
-    price_amount: Money;
-    /** Fiat currency in which the price_amount is specified (usd, eur, etc). */
-    price_currency: FiatCurrency;
-    /** Crypto currency in which the pay_amount is specified. */
-    pay_currency?: CryptoCurrency;
-    /** Url to receive callbacks. */
-    ipn_callback_url?: string;
-    /** Inner store order ID. */
-    order_id?: string;
-    /** Inner store order description. */
-    order_description?: string;
   }
 
   /** Customer payment record. */
@@ -151,6 +144,20 @@ export namespace Customer {
     updated_at: string;
   }
 
+  /** Payload to create a payment for a customer. */
+  export interface CreatePaymentPayload {
+    currency: string;
+    amount: number;
+    sub_partner_id: string;
+    is_fixed_rate: boolean;
+    is_fee_paid_by_user: boolean;
+    ipn_callback_url: string;
+  }
+
+  export interface CreatePaymentResponse {
+    result: Payment;
+  }
+
   /** Customer payments list response. */
   export interface PaymentsListResponse {
     result: Payment[];
@@ -166,125 +173,55 @@ export namespace Customer {
   }
 
   export interface CreateDepositResponse {
+    result: Deposit;
+  }
+
+  /** Deposit record. */
+  export interface Deposit {
+    payment_id: string;
+    payment_status: PaymentStatus;
+    pay_address: string;
+    price_amount: number;
+    price_currency: string;
+    pay_amount: number;
+    amount_received: number;
+    pay_currency: string;
+    order_id: string | null;
+    order_description: string | null;
+    ipn_callback_url: string | null;
+    created_at: string;
+    updated_at: string;
+    purchase_id: string;
+    smart_contract: any;
+    network: string;
+    network_precision: any;
+    time_limit: any;
+    burning_percent: any;
+    expiration_estimate_date: string;
+    is_fixed_rate: boolean;
+    is_fee_paid_by_user: boolean;
+    valid_until: string;
+    type: string;
+  }
+
+  /** Transfer record. */
+  export interface Transfer {
     id: string;
-    /** main account */
     from_sub_id: string;
-    /** sub account */
     to_sub_id: string;
-    status: ListTransfersStatus,
+    status: TransactionStatus;
     created_at: string;
     updated_at: string;
     amount: string;
     currency: string;
   }
 
-  /** Deposit record. */
-  export interface Deposit {
-    /** Deposit id. */
-    id: number;
-    /** Customer id. */
-    sub_partner_id: string;
-    /** Payment status. */
-    payment_status: PaymentStatus;
-    /** Deposit address. */
-    pay_address: string;
-    /** Amount to deposit. */
-    pay_amount: Money;
-    /** Amount actually deposited. */
-    actually_paid?: Money;
-    /** Fiat equivalent of actually deposited amount. */
-    actually_paid_at_fiat?: Money;
-    /** Crypto currency. */
-    pay_currency: CryptoCurrency;
-    /** Fiat amount. */
-    price_amount: Money;
-    /** Fiat currency. */
-    price_currency: FiatCurrency;
-    /** Order ID. */
-    order_id: string | null;
-    /** Order description. */
-    order_description: string | null;
-    /** Purchase ID. */
-    purchase_id: string | null;
-    /** Outcome amount. */
-    outcome_amount?: Money;
-    /** Outcome currency. */
-    outcome_currency?: CryptoCurrency;
-    /** Parent payment ID. */
-    parent_payment_id?: number | null;
-    /** Invoice ID. */
-    invoice_id?: string | null;
-    /** Payment extra IDs. */
-    payment_extra_ids?: string | null;
-    /** Created at timestamp. */
-    created_at: string;
-    /** Updated at timestamp. */
-    updated_at: string;
-  }
-
-  /** Deposit list response. */
-  export interface DepositListResponse {
-    result: Deposit[];
-    /** Total number of deposits. */
-    count: number;
-  }
-
   /** Payload to transfer between customers. */
   export interface TransferPayload {
-    /** From customer id. */
     from_id: string;
-    /** To customer id. */
     to_id: string;
-    /** Amount to transfer. */
-    amount: number;
-    /** Currency of the amount to transfer. */
+    amount: string;
     currency: string;
-  }
-
-  /** Transfer record. */
-  export interface Transfer {
-    /** Transfer id. */
-    id: number;
-    /** From customer id. */
-    from_sub_partner_id: string;
-    /** To customer id. */
-    to_sub_partner_id: string;
-    /** Payment status. */
-    payment_status: PaymentStatus;
-    /** Deposit address. */
-    pay_address: string;
-    /** Amount to transfer. */
-    pay_amount: Money;
-    /** Amount actually transferred. */
-    actually_paid?: Money;
-    /** Fiat equivalent of actually transferred amount. */
-    actually_paid_at_fiat?: Money;
-    /** Crypto currency. */
-    pay_currency: CryptoCurrency;
-    /** Fiat amount. */
-    price_amount: Money;
-    /** Fiat currency. */
-    price_currency: FiatCurrency;
-    /** Order ID. */
-    order_id: string | null;
-    /** Order description. */
-    order_description: string | null;
-    /** Purchase ID. */
-    purchase_id: string | null;
-    /** Outcome amount. */
-    outcome_amount?: Money;
-    /** Outcome currency. */
-    outcome_currency?: CryptoCurrency;
-    /** Parent payment ID. */
-    parent_payment_id?: number | null;
-    /** Invoice ID. */
-    invoice_id?: string | null;
-    /** Payment extra IDs. */
-    payment_extra_ids?: string | null;
-    /** Created at timestamp. */
-    created_at: string;
-    /** Updated at timestamp. */
-    updated_at: string;
   }
 
   /** Transfer list response. */
@@ -311,6 +248,29 @@ export namespace Customer {
       updated_at: string;
       amount: string;
       currency: string;
-    }
+    };
+  }
+
+  export interface ListPaymentsParams {
+    /** amount of listed results */
+    limit: number;
+    /** set the offset for listed results */
+    page?: number;
+    /** filter by payment ID */
+    id?: string;
+    /** filter by deposit currency */
+    pay_currency?: string;
+    /** filter by status */
+    status?: string;
+    /** filter by sub-partner ID */
+    sub_partner_id?: string;
+    /** filter by date (from) */
+    date_from?: string;
+    /** filter by date (to) */
+    date_to?: string;
+    /** set the order for listed results (asc, desc) */
+    orderBy?: "asc" | "desc";
+    /** sort results by 'id', 'status', 'pay_currency', 'created_at', 'updated_at' */
+    sortBy?: "id" | "status" | "pay_currency" | "created_at" | "updated_at";
   }
 }

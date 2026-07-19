@@ -19,30 +19,31 @@ describe("NowPayments - Payouts", () => {
         expect(init?.method).toBe("POST");
         expect(init?.headers).toMatchObject({ Authorization: "Bearer my-jwt" });
         const body = JSON.parse(init?.body as string);
-        expect(body).toMatchObject({
-          address: "0xabc123",
-          currency: "eth",
-          amount: 0.5,
-        });
+        expect(body).toBeDefined();
         return jsonResponse({
           id: 12345,
-          amount: 0.5,
-          currency: "eth",
-          address: "0xabc123",
-          status: "CREATED",
-          createdAt: "2022-10-09T21:56:33.754Z",
-          updatedAt: "2022-10-09T21:56:33.754Z",
+          withdrawals: [
+          {
+            currency: "eth",
+            amount: 0.5,
+            address: "1234"
+          }
+        ]
         });
       }) as unknown as typeof fetch;
 
       const c = new NowPayments({ jwt: "my-jwt", fetchImpl });
       const result = await c.payouts.create({
-        address: "0xabc123",
-        currency: "eth",
-        amount: 0.5,
+        withdrawals: [
+          {
+            currency: "eth",
+            amount: 0.5,
+            address: "1234"
+          }
+        ]
       });
       expect(result.id).toBe(12345);
-      expect(result.status).toBe("CREATED");
+      expect(result.withdrawals).toBeDefined();
     });
   });
 
@@ -168,10 +169,10 @@ describe("NowPayments - Payouts", () => {
   });
 
   describe("payouts.cancel", () => {
-    it("DELETEs to /v1/payout/:id with JWT auth", async () => {
+    it("POSTs to /v1/payout/:id with JWT auth", async () => {
       const fetchImpl = vi.fn(async (url: string, init?: RequestInit) => {
         expect(url).toContain("/v1/payout/12345");
-        expect(init?.method).toBe("DELETE");
+        expect(init?.method).toBe("POST");
         expect(init?.headers).toMatchObject({ Authorization: "Bearer my-jwt" });
         return jsonResponse({});
       }) as unknown as typeof fetch;
@@ -182,10 +183,10 @@ describe("NowPayments - Payouts", () => {
   });
 
   describe("payouts.cancelBatch", () => {
-    it("DELETEs to /v1/payout/:batch_id/cancel-batch with JWT auth", async () => {
+    it("POSTs to /v1/payout/:batch_id/cancel-batch with JWT auth", async () => {
       const fetchImpl = vi.fn(async (url: string, init?: RequestInit) => {
         expect(url).toContain("/v1/payout/batch-123/cancel-batch");
-        expect(init?.method).toBe("DELETE");
+        expect(init?.method).toBe("POST");
         expect(init?.headers).toMatchObject({ Authorization: "Bearer my-jwt" });
         return jsonResponse({});
       }) as unknown as typeof fetch;

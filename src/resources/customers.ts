@@ -1,59 +1,29 @@
-import type { HttpClient, RequestOptions, QueryParams } from "../http.js";
+import type { RequestOptions, QueryParams } from "../http.js";
 import type {
   ListTransfersParams
 } from "../types/index.js";
 import type { Customer } from "../types/customers.types.js";
-
-/** Base class for resource groups — holds a reference to the HTTP client. */
-abstract class Resource {
-  protected readonly http: HttpClient;
-  constructor(http: HttpClient) {
-    this.http = http;
-  }
-}
-
-export interface ListPaymentsCustomerParams {
-  /** amount of listed results */
-  limit: number;
-  /** set the offset for listed results */
-  page?: number;
-  /** filter by payment ID */
-  id?: string;
-  /** filter by deposit currency */
-  pay_currency?: string;
-  /** filter by status */
-  status?: string;
-  /** filter by sub-partner ID */
-  sub_partner_id?: string;
-  /** filter by date (from) */
-  date_from?: string;
-  /** filter by date (to) */
-  date_to?: string;
-  /** set the order for listed results (asc, desc) */
-  orderBy?: "asc" | "desc";
-  /** sort results by 'id', 'status', 'pay_currency', 'created_at', 'updated_at' */
-  sortBy?: "id" | "status" | "pay_currency" | "created_at" | "updated_at";
-}
+import { Resource } from "./main.js";
 
 /**
  * Customer management (sub-partner) endpoints.
  *
  * - `GET /v1/sub-partner/balance/:id` — get a customer's balance (API key).
  * - `GET /v1/sub-partner` — list customers (JWT).
- * - `POST /v1/sub-partner` — create a customer account (JWT).
- * - `POST /v1/sub-partner/recurring` — create a recurring payment (JWT).
+ * - `POST /v1/sub-partner/balance` — create a customer account (JWT).
  * - `POST /v1/sub-partner/payment` — create a payment for a customer (JWT).
  * - `GET /v1/sub-partner/payments` — list payments for a customer (JWT).
  * - `POST /v1/sub-partner/deposit` — deposit funds to a customer (JWT).
  * - `POST /v1/sub-partner/transfer` — transfer funds between customers (JWT).
- * - `GET /v1/sub-partner/transfer` — list transfers (JWT).
+ * - `GET /v1/sub-partner/transfers` — list transfers (JWT).
  * - `GET /v1/sub-partner/transfer/:id` — get a single transfer (JWT).
  * - `POST /v1/sub-partner/write-off` — write off funds from a customer (JWT).
  */
 export class CustomerResource extends Resource {
   /**
-   * Returns the balance of a specific customer/sub-partner.
-   * Authenticated with the API key.
+   * This request can be made only from a whitelisted IP.
+   * If IP whitelisting is disabled, this request can be made by any user that has an API key.
+   * @requires APIKey
    */
   balance(customerId: string, options?: RequestOptions): Promise<Customer.BalanceResponse> {
     return this.http.get<Customer.BalanceResponse>(
@@ -64,10 +34,10 @@ export class CustomerResource extends Resource {
   }
 
   /**
-   * Returns the list of customers.
-   * Authenticated with a JWT bearer token.
+   * This method returns the entire list of your customers.
+   * @requires JWT
    */
-  list(params?: { limit?: number; offset?: number; order?: string }, options?: RequestOptions): Promise<Customer.ListResponse> {
+  list(params?: Customer.ListParams, options?: RequestOptions): Promise<Customer.ListResponse> {
     return this.http.get<Customer.ListResponse>(
       "/v1/sub-partner",
       params as QueryParams | undefined,
@@ -76,44 +46,33 @@ export class CustomerResource extends Resource {
   }
 
   /**
-   * Creates a new customer account.
-   * Authenticated with a JWT bearer token.
+   * This is a method to create an account for your customer. 
+   * After this you'll be able to generate a payment(/v1/sub-partner/payment) or deposit(/v1/sub-partner/deposit) 
+   * for topping up its balance as well as withdraw funds from it.
+   * @requires JWT
    */
   create(
     payload: Customer.CreatePayload,
     options?: RequestOptions,
   ): Promise<Customer.CreateResponse> {
     return this.http.post<Customer.CreateResponse>(
-      "/v1/sub-partner",
+      "/v1/sub-partner/balance",
       payload as unknown as Record<string, unknown>,
       options,
     );
   }
 
   /**
-   * Creates a recurring payment for a customer.
-   * Authenticated with a JWT bearer token.
-   */
-  createRecurringPayment(
-    payload: { customer_id: string; amount: string; currency: string },
-    options?: RequestOptions,
-  ): Promise<{ result: { id: string; status: string; amount: string; currency: string } }> {
-    return this.http.post<{ result: { id: string; status: string; amount: string; currency: string } }>(
-      "/v1/sub-partner/recurring",
-      payload as unknown as Record<string, unknown>,
-      options,
-    );
-  }
-
-  /**
-   * Creates a payment for a customer.
-   * Authenticated with a JWT bearer token.
+   * This method allows you to top up a customer account with a general payment.
+   * You can check the actual payment status by using GET 9 Get payment status request.
+   * @requires JWT
+   * @requires APIKey
    */
   createPayment(
     payload: Customer.CreatePaymentPayload,
     options?: RequestOptions,
-  ): Promise<Customer.Payment> {
-    return this.http.post<Customer.Payment>(
+  ): Promise<Customer.CreatePaymentResponse> {
+    return this.http.post<Customer.CreatePaymentResponse>(
       "/v1/sub-partner/payment",
       payload as unknown as Record<string, unknown>,
       options,
@@ -121,11 +80,11 @@ export class CustomerResource extends Resource {
   }
 
   /**
-   * Returns the list of payments for a customer.
-   * Authenticated with a JWT bearer token.
+   * This method allows you to get the list of all payments generated for a particular customer.
+   * @requires JWT
    */
   listPayments(
-    params?: ListPaymentsCustomerParams,
+    params?: Customer.ListPaymentsParams,
     options?: RequestOptions,
   ): Promise<Customer.PaymentsListResponse> {
     return this.http.get<Customer.PaymentsListResponse>(
@@ -136,14 +95,16 @@ export class CustomerResource extends Resource {
   }
 
   /**
-   * This is a method for transferring funds from your master account to a customer's one.
-   * The actual information about the transfer's status can be obtained via Get transfer method.
+   * This method allows you to top up a customer account with a general payment.
+   * You can check the actual payment status by using GET 9 Get payment status request.
+   * @requires JWT
+   * @requires APIKey
    */
   createDeposits(
     payload: Customer.DepositPayload,
     options?: RequestOptions,
-  ): Promise<{ result: Customer.CreateDepositResponse }> {
-    return this.http.post<{ result: Customer.CreateDepositResponse }>(
+  ): Promise<Customer.CreateDepositResponse> {
+    return this.http.post<Customer.CreateDepositResponse>(
       "/v1/sub-partner/deposit",
       payload as unknown as Record<string, unknown>,
       options,
@@ -151,31 +112,9 @@ export class CustomerResource extends Resource {
   }
 
   /**
-   * Returns the list of deposits for a customer.
-   * Authenticated with a JWT bearer token.
-   */
-  listDeposits(
-    params?: { limit?: number; page?: number; id?: string; pay_currency?: string; status?: string; sub_partner_id?: string; date_from?: string; date_to?: string; orderBy?: "asc" | "desc"; sortBy?: "id" | "status" | "pay_currency" | "created_at" | "updated_at" },
-    options?: RequestOptions,
-  ): Promise<Customer.DepositListResponse> {
-    return this.http.get<Customer.DepositListResponse>(
-      "/v1/sub-partner/deposit",
-      params as QueryParams | undefined,
-      options,
-    );
-  }
-
-  /**
-   * Returns a single deposit by its id.
-   * Authenticated with a JWT bearer token.
-   */
-  getDeposit(depositId: number | string, options?: RequestOptions): Promise<Customer.Deposit> {
-    return this.http.get<Customer.Deposit>(`/v1/sub-partner/deposit/${depositId}`, undefined, options);
-  }
-
-  /**
-   * Creates a transfer between two customers.
-   * Authenticated with a JWT bearer token.
+   * This method allows creating transfers between users' accounts.
+   * You can check the transfer's status using Get transfer method.
+   * @requires JWT
    */
   createTransfers(
     params: Customer.TransferPayload,
@@ -189,23 +128,23 @@ export class CustomerResource extends Resource {
   }
   
   /**
-   * Returns the list of transfers for a customer.
-   * Authenticated with a JWT bearer token.
+   * Returns the entire list of transfers created by your customers.
+   * @requires JWT
    */
   listTransfers(
     params?: ListTransfersParams,
     options?: RequestOptions,
   ): Promise<Customer.TransferListResponse> {
     return this.http.get<Customer.TransferListResponse>(
-      "/v1/sub-partner/transfer",
+      "/v1/sub-partner/transfers",
       params as QueryParams | undefined,
       options,
     );
   }
 
   /**
-   * Returns a single transfer by its id.
-   * Authenticated with a JWT bearer token.
+   * Get the actual information about the transfer. You need to provide the transfer ID in the request.
+   * @requires JWT
    */
   getTransfer(transferId: number | string, options?: RequestOptions): Promise<Customer.Transfer> {
     return this.http.get<Customer.Transfer>(`/v1/sub-partner/transfer/${transferId}`, undefined, options);
@@ -213,6 +152,7 @@ export class CustomerResource extends Resource {
 
   /**
    * With this method you can withdraw funds from a customer's account and transfer them to your master account.
+   * @requires JWT
    */
   createWriteOff(
     payload: Customer.WriteOffPayload,

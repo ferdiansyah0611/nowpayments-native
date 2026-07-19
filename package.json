@@ -17,10 +17,14 @@
     "build": "tsc",
     "types": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:resources": "vitest run test/resources",
+    "test:e2e": "vitest run test/e2e"
   },
   "devDependencies": {
+    "@types/dotenv": "^6.1.1",
     "@types/node": "^20.19.43",
+    "dotenv": "^17.4.2",
     "typescript": "^5.9.3",
     "vitest": "^1.6.1"
   }

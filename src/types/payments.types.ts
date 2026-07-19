@@ -196,6 +196,37 @@ export namespace Payment {
     /** Human-readable message describing the result. */
     message?: string;
   }
+
+  export interface ListParams {
+    /** number of records in one page. (possible values: from 1 to 500) */
+    limit: number;
+    /** the page number you want to get (possible values: from 0 to page count - 1); */
+    page: number;
+    /** filtering payments by certain invoice ID; */
+    invoiceId?: string;
+    /** sort the received list by a paramenter. Set to created_at by default */
+    sortBy:
+      | 'payment_id'
+      | 'payment_status'
+      | 'pay_address'
+      | 'price_amount'
+      | 'price_currency'
+      | 'pay_amount'
+      | 'actually_paid'
+      | 'pay_currency'
+      | 'order_id'
+      | 'order_description'
+      | 'purchase_id'
+      | 'outcome_amount'
+      | 'outcome_currency'
+      | 'created_at';
+    /** display the list in ascending or descending order. Set to asc by default */
+    orderBy: 'asc' | 'desc';
+    /** select the displayed period start date (date format: YYYY-MM-DD or yy-MM-ddTHH:mm:ss.SSSZ) */
+    dateFrom?: string;
+    /** select the displayed period end date (date format: YYYY-MM-DD or yy-MM-ddTHH:mm:ss.SSSZ) */
+    dateTo?: string;
+  }
 }
 
 export namespace Currencies {
@@ -212,6 +243,9 @@ export namespace Currencies {
     /** Available currency tickers (e.g. `btc`, `eth`, `usdttrc20`). */
     currencies: string[];
   };
+  export type CheckedResponse = {
+    selectedCurrencies: string[];
+  }
   /** Detailed information about a cryptocurrency (returned by `/v1/full-currencies`). */
   export interface FullCurrency {
     /** Internal NowPayments id. */

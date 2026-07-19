@@ -21,14 +21,53 @@ export namespace Payout {
 
   /** Payload to create a payout. */
   export interface CreatePayload {
-    address: string;
-    currency: CryptoCurrency;
-    amount: Money;
-    extra_id?: string;
     ipn_callback_url?: string;
-    batch?: boolean;
-    subtract?: boolean;
+    withdrawals: {
+      address: string;
+      currency: CryptoCurrency;
+      amount: Money;
+      fiat_amount?: number;
+      fiat_currency?: string;
+      ipn_callback_url?: string;
+    }[];
   }
+
+  export interface CreateResponse {
+    id: string;
+    withdrawals: Withdrawal[];
+  }
+
+  export interface Withdrawal {
+    id: string;
+    address: string;
+    currency: string;
+    amount: string;
+    ipn_callback_url: string;
+    batch_withdrawal_id: string;
+    status: WithdrawalStatus,
+    error: any;
+    extra_id: any;
+    hash: any;
+    payout_description: any;
+    unique_external_id: any;
+    requested_at: null,
+    created_at: string;
+    updated_at: string;
+    update_history_log: any;
+    rejected_check_attempts: number;
+    fee: number | null;
+    fee_paid_by: string | null;
+    is_request_payouts: boolean;
+  }
+
+  export type WithdrawalStatus =
+    | 'CREATING'
+    | 'WAITING'
+    | 'PROCESSING'
+    | 'SENDING'
+    | 'FINISHED'
+    | 'FAILED'
+    | 'REJECTED';
 
   /** Payload to validate a payout address (`POST /v1/payout/validate-address`). */
   export interface ValidateAddressPayload {

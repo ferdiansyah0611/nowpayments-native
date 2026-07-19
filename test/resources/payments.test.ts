@@ -56,7 +56,7 @@ describe("NowPayments - Payments", () => {
       }) as unknown as typeof fetch;
 
       const c = new NowPayments({ apiKey: "k", fetchImpl });
-      const result = await c.payments.list({ limit: 10, page: 0 });
+      const result = await c.payments.list({ limit: 10, orderBy: 'asc', page: 0, sortBy: 'actually_paid' });
       expect(result.total).toBe(0);
       expect(result.pagesCount).toBe(0);
     });
@@ -103,33 +103,6 @@ describe("NowPayments - Payments", () => {
       const result = await c.payments.balance();
       expect(result.eth.amount).toBe(0.00018);
       expect(result.trx.pendingAmount).toBe(0);
-    });
-  });
-
-  describe("payments.getInvoice", () => {
-    it("GETs /v1/invoice/:id and returns the invoice", async () => {
-      const fetchImpl = vi.fn(async (url: string) => {
-        expect(url).toContain("/v1/invoice/4522625843");
-        return jsonResponse({
-          id: 4522625843,
-          order_id: "RGDBP-21314",
-          order_description: "desc",
-          price_amount: 1000,
-          price_currency: "usd",
-          pay_currency: null,
-          ipn_callback_url: "",
-          invoice_url: "https://nowpayments.io/payment/?iid=4522625843",
-          success_url: "",
-          cancel_url: "",
-          created_at: "",
-          updated_at: "",
-        });
-      }) as unknown as typeof fetch;
-
-      const c = new NowPayments({ apiKey: "k", fetchImpl });
-      const invoice = await c.payments.getInvoice(4522625843);
-      expect(invoice.id).toBe(4522625843);
-      expect(invoice.invoice_url).toContain("iid=4522625843");
     });
   });
 
