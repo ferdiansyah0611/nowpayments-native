@@ -5,7 +5,7 @@ import { Resource } from "./main.js";
 /**
  * Email subscriptions (recurring payments) endpoints.
  *
- * - `POST v1/subscriptions` — create a subscription (JWT).
+ * - `POST v1/subscriptions` — create a subscription (API KEY & JWT).
  * - `GET v1/subscriptions` — list subscriptions (JWT).
  * - `PUT v1/subscriptions/:id` — update a subscription (JWT).
  * - `POST v1/subscriptions/:id/cancel` — cancel a subscription (JWT).
@@ -16,13 +16,6 @@ import { Resource } from "./main.js";
  * - `GET v1/subscriptions/plans/:id` — get a plan (API key).
  * - `GET v1/subscriptions/plans` — list plans (API key).
  * - `PATCH v1/subscriptions/plans/:id` — update a plan (JWT).
- *
- * Subscription payments (recurring payments) endpoints.
- *
- * - `POST v1/subscriptions` — create a subscription payment (API key & JWT).
- * - `GET v1/subscriptions` — list subscription payments (API key).
- * - `GET v1/subscriptions/:id` — get a subscription payment (API key).
- * - `DELETE v1/subscriptions/:id` — cancel a subscription payment (JWT).
  */
 export class SubscriptionResource extends Resource {
   /**
@@ -101,7 +94,7 @@ export class SubscriptionResource extends Resource {
     );
   }
 
-  /**
+  /**  
    * The method allows you to view the entire list of recurring payments filtered by payment status and/or payment plan id
    * @requires APIKey
    */

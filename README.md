@@ -349,18 +349,13 @@ All endpoints are under `https://api.nowpayments.io/v1/`.
 | `customers`   | `createTransfers` | `POST /v1/sub-partner/transfer` | JWT |
 | `customers`   | `listTransfers` | `GET /v1/sub-partner/transfers` | JWT |
 | `customers`   | `getTransfer` | `GET /v1/sub-partner/transfer/{id}` | JWT |
-| `subscriptions` | `create`  | `POST v1/subscriptions` | JWT |
-| `subscriptions` | `list`    | `GET v1/subscriptions` | JWT |
-| `subscriptions` | `update`  | `PUT v1/subscriptions/{id}` | JWT |
-| `subscriptions` | `cancel`  | `POST v1/subscriptions/{id}/cancel` | JWT |
-| `subscriptions` | `createPlan` | `POST v1/subscriptions/plans` | JWT |
 | `subscriptions` | `getPlan` | `GET v1/subscriptions/plans/{id}` | API key |
 | `subscriptions` | `getAllPlans` | `GET v1/subscriptions/plans` | API key |
 | `subscriptions` | `updatePlan` | `PATCH v1/subscriptions/plans/{id}` | JWT |
 | `subscriptions` | `createPayment` | `POST v1/subscriptions` | API key & JWT |
 | `subscriptions` | `listPayments` | `GET v1/subscriptions` | API key |
 | `subscriptions` | `getPayment` | `GET v1/subscriptions/{id}` | API key |
-| `subscriptions` | `cancelPayment` | `DELETE v1/subscriptions/{id}` | JWT |
+| `subscriptions` | `cancelPayment` | `POST v1/subscriptions/{id}` | JWT |
 
 ## Developer
 
