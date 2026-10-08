@@ -244,10 +244,12 @@ export namespace Customer {
       from_sub_id: string;
       to_sub_id: string;
       status: ListTransfersStatus;
-      created_at: string;
-      updated_at: string;
       amount: string;
       currency: string;
+      destination: string;
+      type: string;
+      created_at: string;
+      updated_at: string;
     };
   }
 
