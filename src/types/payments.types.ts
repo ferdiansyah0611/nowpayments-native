@@ -250,7 +250,7 @@ export namespace Currencies {
   export interface FullCurrency {
     /** Internal NowPayments id. */
     id: number;
-    /** Currency ticker code (e.g. `AAVE`, `btc`). */
+    /** Currency ticker code (e.g. `1INCH`, `btc`). */
     code: string;
     /** Human-readable name. */
     name: string;
@@ -262,10 +262,48 @@ export namespace Currencies {
     priority: number;
     /** Whether an extra id (memo/tag) is required for deposits. */
     extra_id_exists: boolean;
+    /** Regex used to validate the extra id, when applicable. */
+    extra_id_regex: string | null;
     /** Relative URL to the currency logo. */
     logo_url: string;
+    /** Whether the currency is tracked. */
+    track: boolean;
+    /** CoinGecko id for market data. */
+    cg_id: string;
+    /** Whether the currency has a max deposit limit. */
+    is_maxlimit: boolean;
     /** Network the currency runs on (e.g. `eth`, `btc`, `trx`). */
     network: string;
+    /** Smart contract address, when applicable. */
+    smart_contract: string | null;
+    /** Number of decimal places used on the network. */
+    network_precision: string;
+    /** Hash used to build explorer links, when available. */
+    explorer_link_hash: string | null;
+    /** Number of decimal places used by NowPayments. */
+    precision: number;
+    /** Ticker symbol. */
+    ticker: string;
+    /** Whether the currency is a DeFi token. */
+    is_defi: boolean;
+    /** Whether the currency is marked as popular. */
+    is_popular: boolean;
+    /** Whether the currency is a stablecoin. */
+    is_stable: boolean;
+    /** Whether the currency can be used as the "to" side of a conversion. */
+    available_for_to_conversion: boolean;
+    /** Trust Wallet asset id, when available. */
+    trust_wallet_id: string | null;
+    /** Creation timestamp. */
+    created_at: string;
+    /** Last update timestamp. */
+    updated_at: string;
+    /** Whether the currency can be used for payments. */
+    available_for_payment: boolean;
+    /** Whether the currency can be used for payouts. */
+    available_for_payout: boolean;
+    /** Whether the extra id is optional. */
+    extra_id_optional: boolean;
   }
   /** Response wrapper for `GET /v1/full-currencies`. */
   export interface FullCurrenciesResponse {
